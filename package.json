@@ -1,12 +1,10 @@
 {
-    "name": "react-native-aes",
+    "name": "react-native-aes-crypto",
     "version": "1.0.0",
-    "description": "A AES crypto for react-native",
+    "description": "AES crypto native module for react-native",
     "main": "index.js",
-    "author": {
-        "name": "tectiv3",
-    },
-    "license": "MIT",
+    "author": "tectiv3",
+    "license": "GPL-3.0",
     "keywords": [
         "react-native",
         "react-component",
@@ -23,5 +21,8 @@
     "repository": {
         "type": "git",
         "url": "git://github.com/tectiv3/react-native-aes.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
     }
 }

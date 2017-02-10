@@ -4,7 +4,7 @@ AES crypto for react-native
 
 ## Installation
 ```sh
-npm install --save react-native-aes
+npm install --save react-native-aes-crypto
 ```
 ### Installation (iOS)
 * Drag RCTAes.xcodeproj to your project on Xcode.
@@ -68,4 +68,3 @@ Aes.encrypt("These violent delights have violent ends", "Arnold", function(base6
 
 - `encrypt(text, key, callback)`
 - `decrypt(base64, key, callback)`
-
