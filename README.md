@@ -7,8 +7,8 @@ AES encryption/decryption for react-native
 npm install --save react-native-aes-crypto
 ```
 ### Installation (iOS)
-* Drag RCTAes.xcodeproj to your project on Xcode.
-* Click on your main project file (the one that represents the .xcodeproj) select Build Phases and drag libRCTAes.a from the Products folder inside the RCTAes.xcodeproj.
+
+See [Linking Libraries](http://facebook.github.io/react-native/docs/linking-libraries-ios.html)
 
 ### Installation (Android)
 #### Untested!
