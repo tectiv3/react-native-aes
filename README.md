@@ -67,5 +67,5 @@ Aes.encrypt("These violent delights have violent ends", "Arnold", function(base6
 ### methods
 
 - `encrypt(text, key, callback)`
-- `encrypt(base64, key, callback)`
+- `decrypt(base64, key, callback)`
 
