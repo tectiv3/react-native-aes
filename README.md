@@ -1,6 +1,6 @@
-# React Native Aes
+# React Native AES
 
-AES crypto for react-native
+AES encryption/decryption for react-native
 
 ## Installation
 ```sh
