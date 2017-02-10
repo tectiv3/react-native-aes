@@ -52,15 +52,18 @@ protected List<ReactPackage> getPackages() {
 import { NativeModules } from 'react-native';
 var Aes = NativeModules.Aes;
 
-Aes.encrypt("These violent delights have violent ends", "Arnold", function(base64) {
-    console.log(base64);
-    Aes.decrypt(base64, "Arnold", function(text) {
-        console.log(text);
-    }, function(){
-        console.log("error");
-    });
+Aes.generateKey("Arnold", function(key) {
+    Aes.encrypt("These violent delights have violent ends", key, function(base64) {
+        console.log(base64);
+        Aes.decrypt(base64, key, function(text) {
+            console.log(text);
+        }, function(){
+            console.log("decrypt error");
+        });
+    }, function() {
+        console.log("encrypt error");
 }, function() {
-    console.log("error");
+    console.log("generate key error");
 });
 ```
 
@@ -68,3 +71,4 @@ Aes.encrypt("These violent delights have violent ends", "Arnold", function(base6
 
 - `encrypt(text, key, callback)`
 - `decrypt(base64, key, callback)`
+- `generateKey(text, callback)`

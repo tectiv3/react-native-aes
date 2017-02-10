@@ -31,4 +31,13 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key success:(RCTRes
         success(@[data]);
     }
 }
+
+RCT_EXPORT_METHOD(generateKey:(NSString *)password success:(RCTResponseSenderBlock)success error:(RCTResponseSenderBlock)error) {
+    NSString *data = [AesCrypt generateKey:password];
+    if (data == nil) {
+        error(@[]);
+    } else {
+        success(@[data]);
+    }
+}
 @end

@@ -56,6 +56,16 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void generateKey(String pwd, Callback success, Callback error) {
+        try {
+            String strs = generateKey(pwd);
+            success.invoke(strs);
+        } catch (Exception e) {
+            error.invoke(e.getMessage());
+        }
+    }
+
     private static SecretKey getSecretKey(String pwd) {
         try {
             PBEKeySpec pbeKeySpec = new PBEKeySpec(pwd.toCharArray());
@@ -67,6 +77,11 @@ public class RCTAes extends ReactContextBaseJavaModule {
         catch (Exception e) {
             return null;
         }
+    }
+
+    private static String generateKey(String pwd) {
+        //placeholder for PBKDF2
+        return pwd;
     }
 
     private static String encrypt(String text, String pwd) {
@@ -102,4 +117,5 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
         return new String(decrypted, "UTF-8");
     }
+
 }

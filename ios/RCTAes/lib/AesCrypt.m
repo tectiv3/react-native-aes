@@ -6,9 +6,33 @@
 //
 
 #import <CommonCrypto/CommonCryptor.h>
+#import <CommonCrypto/CommonDigest.h>
+#import <CommonCrypto/CommonKeyDerivation.h>
+
 #import "AesCrypt.h"
 
 @implementation AesCrypt
+
++ (NSString *) generateKey:(NSString *)password {
+    // Data of String to generate Hash key(hexa decimal string).
+    NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
+
+    // Salt data from sha1 of a password string
+    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+    CC_SHA1(passwordData.bytes, (CC_LONG)passwordData.length, digest);
+    NSData* saltData = [NSData dataWithBytes:digest length:(NSUInteger)CC_SHA1_DIGEST_LENGTH];
+
+    // Hash key (hexa decimal) string data length.
+    NSMutableData *hashKeyData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
+
+    // Key Derivation using PBKDF2 algorithm.
+    int status = CCKeyDerivationPBKDF(kCCPBKDF2, passwordData.bytes, passwordData.length, saltData.bytes, saltData.length, kCCPRFHmacAlgSHA1, 20000, hashKeyData.mutableBytes, hashKeyData.length);
+    if (status == kCCParamError) {
+        NSLog(@"Key derivation error");
+    }
+
+    return [hashKeyData base64EncodedStringWithOptions:0];
+}
 
 + (NSString *) encrypt: (NSString *)clearText  key: (NSString *)key {
     char keyPtr[kCCKeySizeAES256 + 1]; // room for terminator (unused)
@@ -31,7 +55,7 @@
         NSData *nsdata = [NSData dataWithBytes:buffer length:(NSUInteger)numBytesEncrypted];
         result = [nsdata base64EncodedStringWithOptions:0];
     } else {
-        NSLog(@"%d", cryptStatus);
+        NSLog(@"Encrypt error, %d", cryptStatus);
     }
 
     free(buffer);
@@ -59,7 +83,7 @@
         NSData* data = [NSData dataWithBytes:buffer length:(NSUInteger)numBytesDecrypted];
         result = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     } else {
-        NSLog(@"%d", cryptStatus);
+        NSLog(@"Decrypt error, %d", cryptStatus);
     }
 
     free(buffer);

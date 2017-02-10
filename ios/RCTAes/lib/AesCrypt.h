@@ -10,4 +10,5 @@
 @interface AesCrypt : NSObject
 + (NSString *) encrypt: (NSString *)clearText  key: (NSString *)key;
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key;
++ (NSString *) generateKey: (NSString *)password;
 @end
