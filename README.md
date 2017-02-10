@@ -9,9 +9,9 @@ npm install --save react-native-aes
 ### Installation (iOS)
 * Drag RCTAes.xcodeproj to your project on Xcode.
 * Click on your main project file (the one that represents the .xcodeproj) select Build Phases and drag libRCTAes.a from the Products folder inside the RCTAes.xcodeproj.
-* Look for Header Search Paths and make sure it contains both $(SRCROOT)/../../../react-native/React as recursive.
 
 ### Installation (Android)
+#### Untested!
 ```gradle
 ...
 include ':react-native-aes'
@@ -32,24 +32,25 @@ dependencies {
 
 ```java
 ......
-import com.tectiv3.aes.RCTAesPackage;  // <--- import
+import com.tectiv3.aes.RCTAesPackage;
 
 ......
 
 @Override
 protected List<ReactPackage> getPackages() {
    ......
-   new RCTAesPackage(),            // <------ add here
+   new RCTAesPackage(),
    ......
 }
-
+```
 
 ## Usage
 
 ### Example
 
 ```js
-var Aes = require('react-native-aes');
+import { NativeModules } from 'react-native';
+var Aes = NativeModules.Aes;
 
 Aes.encrypt("These violent delights have violent ends", "Arnold", function(base64) {
     console.log(base64);
@@ -63,11 +64,8 @@ Aes.encrypt("These violent delights have violent ends", "Arnold", function(base6
 });
 ```
 
-### method
+### methods
+
 - `encrypt(text, key, callback)`
 - `encrypt(base64, key, callback)`
 
-
-## Server Side
-* see https://github.com/tectiv3/react-native-aes/blob/master/server
-* support java, nodejs, js, php
