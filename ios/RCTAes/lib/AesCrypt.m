@@ -1,9 +1,8 @@
 //
 //  AesCrypt.m
-//  crypt
 //
-//  Created by Fenrir on 10/02/17.
-//  Copyright © 2017 Fenrir. All rights reserved.
+//  Created by tectiv3 on 10/02/17.
+//  Copyright © 2017 tectiv3. All rights reserved.
 //
 
 #import <CommonCrypto/CommonCryptor.h>
