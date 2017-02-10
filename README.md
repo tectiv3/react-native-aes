@@ -1,14 +1,14 @@
-# React Native AES
+# React Native Aes
 
-AES encryption/decryption for react-native
+AES crypto for react-native
 
 ## Installation
 ```sh
 npm install --save react-native-aes-crypto
 ```
 ### Installation (iOS)
-
-See [Linking Libraries](http://facebook.github.io/react-native/docs/linking-libraries-ios.html)
+* Drag RCTAes.xcodeproj to your project on Xcode.
+* Click on your main project file (the one that represents the .xcodeproj) select Build Phases and drag libRCTAes.a from the Products folder inside the RCTAes.xcodeproj.
 
 ### Installation (Android)
 #### Untested!
@@ -53,6 +53,7 @@ import { NativeModules } from 'react-native';
 var Aes = NativeModules.Aes;
 
 Aes.generateKey("Arnold", function(key) {
+    console.log(key);
     Aes.encrypt("These violent delights have violent ends", key, function(base64) {
         console.log(base64);
         Aes.decrypt(base64, key, function(text) {
@@ -62,6 +63,7 @@ Aes.generateKey("Arnold", function(key) {
         });
     }, function() {
         console.log("encrypt error");
+    });
 }, function() {
     console.log("generate key error");
 });
