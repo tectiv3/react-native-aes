@@ -66,6 +66,16 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void hmac(String data, String pwd, Callback success, Callback error) {
+        try {
+            String strs = hmac(data, pwd);
+            success.invoke(strs);
+        } catch (Exception e) {
+            error.invoke(e.getMessage());
+        }
+    }
+
     private static SecretKey getSecretKey(String pwd) {
         try {
             PBEKeySpec pbeKeySpec = new PBEKeySpec(pwd.toCharArray());
@@ -81,6 +91,11 @@ public class RCTAes extends ReactContextBaseJavaModule {
 
     private static String generateKey(String pwd) {
         //placeholder for PBKDF2
+        return pwd;
+    }
+
+    private static String hmac(String text, String key) {
+        //placeholder for HMAC
         return pwd;
     }
 

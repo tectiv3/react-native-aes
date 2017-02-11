@@ -40,4 +40,14 @@ RCT_EXPORT_METHOD(generateKey:(NSString *)password success:(RCTResponseSenderBlo
         success(@[data]);
     }
 }
+
+RCT_EXPORT_METHOD(hmac:(NSString *)base64 key:(NSString *)key success:(RCTResponseSenderBlock)success error:(RCTResponseSenderBlock)error) {
+    NSString *data = [AesCrypt hmac:base64 key:key];
+    if (data == nil) {
+        error(@[]);
+    } else {
+        success(@[data]);
+    }
+}
+
 @end
