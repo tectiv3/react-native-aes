@@ -14,39 +14,51 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(encrypt:(NSString *)data key:(NSString *)key success:(RCTResponseSenderBlock)success error:(RCTResponseSenderBlock)error) {
+RCT_EXPORT_METHOD(encrypt:(NSString *)data key:(NSString *)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
     NSString *base64 = [AesCrypt encrypt:data key:key];
     if (base64 == nil) {
-        error(@[]);
+        reject(@"encrypt_fail", @"Encrypt error", error);
     } else {
-        success(@[base64]);
+        resolve(base64);
     }
 }
 
-RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key success:(RCTResponseSenderBlock)success error:(RCTResponseSenderBlock)error) {
+RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
     NSString *data = [AesCrypt decrypt:base64 key:key];
     if (data == nil) {
-        error(@[]);
+        reject(@"decrypt_fail", @"Decrypt failed", error);
     } else {
-        success(@[data]);
+        resolve(data);
     }
 }
 
-RCT_EXPORT_METHOD(generateKey:(NSString *)password success:(RCTResponseSenderBlock)success error:(RCTResponseSenderBlock)error) {
+RCT_EXPORT_METHOD(generateKey:(NSString *)password
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
     NSString *data = [AesCrypt generateKey:password];
     if (data == nil) {
-        error(@[]);
+        reject(@"keygen_fail", @"Key generation failed", error);
     } else {
-        success(@[data]);
+        resolve(data);
     }
 }
 
-RCT_EXPORT_METHOD(hmac:(NSString *)base64 key:(NSString *)key success:(RCTResponseSenderBlock)success error:(RCTResponseSenderBlock)error) {
+RCT_EXPORT_METHOD(hmac:(NSString *)base64 key:(NSString *)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
     NSString *data = [AesCrypt hmac:base64 key:key];
     if (data == nil) {
-        error(@[]);
+        reject(@"hmac_fail", @"HMAC error", error);
     } else {
-        success(@[data]);
+        resolve(data);
     }
 }
 

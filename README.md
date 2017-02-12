@@ -54,25 +54,41 @@ protected List<ReactPackage> getPackages() {
 import { NativeModules } from 'react-native';
 var Aes = NativeModules.Aes;
 
-Aes.generateKey("Arnold", function(key) {
-    console.log(key);
-    Aes.encrypt("These violent delights have violent ends", key, function(base64) {
-        console.log(base64);
-        Aes.decrypt(base64, key, function(text) {
-            console.log(text);
-        }, function(){
-            console.log("decrypt error");
+try {
+    Aes.generateKey("Arnold").then(key => {
+        console.log('Key:', key);
+        Aes.encrypt("These violent delights have violent ends", key).then(cipher => {
+            console.log("Encrypted: ", cipher);
+            Aes.decrypt(cipher, key).then(text => {
+                console.log("Decrypted:", text);
+            });
+            Aes.hmac(cipher, key).then(hash => {
+                console.log("HMAC", hash);
+            });
         });
-    }, function() {
-        console.log("encrypt error");
     });
-}, function() {
-    console.log("generate key error");
-});
+} catch (e) {
+    console.error(e);
+}
+```
+
+#### Or
+
+```js
+async function decrypt(cipher, key) {
+    try {
+        var text = await Aes.decrypt(cipher, key);
+        console.log(text);
+        return text;
+    } catch (e) {
+        console.error(e);
+    }
+}
 ```
 
 ### methods
 
-- `encrypt(text, key, callback)`
-- `decrypt(base64, key, callback)`
-- `generateKey(text, callback)`
+- `encrypt(text, key)`
+- `decrypt(base64, key)`
+- `generateKey(text)`
+- `hmac(cipher, key)`
