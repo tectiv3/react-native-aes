@@ -62,4 +62,16 @@ RCT_EXPORT_METHOD(hmac:(NSString *)base64 key:(NSString *)key
     }
 }
 
+RCT_EXPORT_METHOD(sha256:(NSString *)text
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
+    NSString *data = [AesCrypt sha256:text];
+    if (data == nil) {
+        reject(@"sha256_fail", @"Hash error", error);
+    } else {
+        resolve(data);
+    }
+}
+
 @end

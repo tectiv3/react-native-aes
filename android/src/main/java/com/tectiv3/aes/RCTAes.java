@@ -76,6 +76,16 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void sha256(String data, Callback success, Callback error) {
+        try {
+            String strs = sha256(data);
+            success.invoke(strs);
+        } catch (Exception e) {
+            error.invoke(e.getMessage());
+        }
+    }
+
     private static SecretKey getSecretKey(String pwd) {
         try {
             PBEKeySpec pbeKeySpec = new PBEKeySpec(pwd.toCharArray());

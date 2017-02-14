@@ -99,4 +99,13 @@
     return [nsdata base64EncodedStringWithOptions:0];
 }
 
++ (NSString *) sha256: (NSString *)input {
+    NSData* inputData = [input dataUsingEncoding:NSUTF8StringEncoding];
+    unsigned char* buffer = malloc(CC_SHA256_DIGEST_LENGTH);
+    CC_SHA256([inputData bytes], (CC_LONG)[inputData length], buffer);
+    NSData *nsdata = [NSData dataWithBytesNoCopy:buffer length:CC_SHA256_DIGEST_LENGTH freeWhenDone:YES];
+    return [nsdata base64EncodedStringWithOptions:0];
+}
+
+
 @end

@@ -92,3 +92,4 @@ async function decrypt(cipher, key) {
 - `decrypt(base64, key)`
 - `generateKey(text)`
 - `hmac(cipher, key)`
+- `sha256(text)`

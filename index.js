@@ -2,8 +2,9 @@
 import { NativeModules } from 'react-native';
 
 module.exports = NativeModules.Aes : {
-    encrypt: (text, key)    => cipher,
-    decrypt: (code, key)    => text,
-    generateKey: (password) => key,
-    hmac: (text, key)       => hash,
+    encrypt: (text, key)    => promise,
+    decrypt: (code, key)    => promise,
+    generateKey: (password) => promise,
+    hmac: (text, key)       => promise,
+    sha256: (text)          => promise,
 };

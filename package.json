@@ -1,6 +1,6 @@
 {
     "name": "react-native-aes-crypto",
-    "version": "1.0.4",
+    "version": "1.0.8",
     "description": "AES crypto native module for react-native",
     "main": "index.js",
     "author": "tectiv3",
@@ -12,7 +12,9 @@
         "android",
         "aes",
         "crypto",
-        "mobile"
+        "mobile",
+        "async",
+        "sha256"
     ],
     "homepage": "https://github.com/tectiv3/react-native-aes",
     "bugs": {

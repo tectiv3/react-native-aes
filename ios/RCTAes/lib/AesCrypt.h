@@ -12,4 +12,5 @@
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key;
 + (NSString *) generateKey: (NSString *)password;
 + (NSString *) hmac: (NSString *)input key: (NSString *)key;
++ (NSString *) sha256: (NSString *)input;
 @end
