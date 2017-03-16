@@ -42,7 +42,7 @@ RCT_EXPORT_METHOD(generateKey:(NSString *)password salt:(NSString *)salt
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSError *error = nil;
-    NSString *data = [AesCrypt generateKey:password];
+    NSString *data = [AesCrypt generateKey:password salt:salt];
     if (data == nil) {
         reject(@"keygen_fail", @"Key generation failed", error);
     } else {
