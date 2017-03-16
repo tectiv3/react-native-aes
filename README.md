@@ -55,7 +55,7 @@ import { NativeModules } from 'react-native';
 var Aes = NativeModules.Aes;
 
 try {
-    Aes.generateKey("Arnold").then(key => {
+    Aes.generateKey("Arnold", "salt").then(key => {
         console.log('Key:', key);
         Aes.encrypt("These violent delights have violent ends", key).then(cipher => {
             console.log("Encrypted: ", cipher);
@@ -90,6 +90,6 @@ async function decrypt(cipher, key) {
 
 - `encrypt(text, key)`
 - `decrypt(base64, key)`
-- `generateKey(text)`
+- `generateKey(text, salt)`
 - `hmac(cipher, key)`
 - `sha256(text)`

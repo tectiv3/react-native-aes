@@ -13,14 +13,17 @@
 
 @implementation AesCrypt
 
-+ (NSString *) generateKey:(NSString *)password {
++ (NSString *) generateKey:(NSString *)password salt: (NSString *)salt {
     // Data of String to generate Hash key(hexa decimal string).
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
-
-    // Salt data from sha1 of a password string
-    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
-    CC_SHA1(passwordData.bytes, (CC_LONG)passwordData.length, digest);
-    NSData* saltData = [NSData dataWithBytes:digest length:(NSUInteger)CC_SHA1_DIGEST_LENGTH];
+    NSData *saltData;
+    if ([salt  isEqual: @""]) {
+        saltData = [salt dataUsingEncoding:NSUTF8StringEncoding];
+    } else {
+        uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+        CC_SHA1(passwordData.bytes, (CC_LONG)passwordData.length, digest);
+        saltData = [NSData dataWithBytes:digest length:(NSUInteger)CC_SHA1_DIGEST_LENGTH];
+    }
 
     // Hash key (hexa decimal) string data length.
     NSMutableData *hashKeyData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];

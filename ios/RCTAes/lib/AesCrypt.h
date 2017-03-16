@@ -10,7 +10,7 @@
 @interface AesCrypt : NSObject
 + (NSString *) encrypt: (NSString *)clearText  key: (NSString *)key;
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key;
-+ (NSString *) generateKey: (NSString *)password;
++ (NSString *) generateKey:(NSString *)password salt: (NSString *)salt;
 + (NSString *) hmac: (NSString *)input key: (NSString *)key;
 + (NSString *) sha256: (NSString *)input;
 @end

@@ -57,9 +57,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void generateKey(String pwd, Callback success, Callback error) {
+    public void generateKey(String pwd, String salt, Callback success, Callback error) {
         try {
-            String strs = generateKey(pwd);
+            String strs = generateKey(pwd, salt);
             success.invoke(strs);
         } catch (Exception e) {
             error.invoke(e.getMessage());
@@ -99,7 +99,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
-    private static String generateKey(String pwd) {
+    private static String generateKey(String pwd, String salt) {
         //placeholder for PBKDF2
         return pwd;
     }

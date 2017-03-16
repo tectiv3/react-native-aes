@@ -38,7 +38,7 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key
     }
 }
 
-RCT_EXPORT_METHOD(generateKey:(NSString *)password
+RCT_EXPORT_METHOD(generateKey:(NSString *)password salt:(NSString *)salt
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSError *error = nil;
