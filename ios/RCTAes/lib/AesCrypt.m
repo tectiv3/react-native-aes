@@ -13,25 +13,29 @@
 
 @implementation AesCrypt
 
-+ (NSString *) generateKey:(NSString *)password salt: (NSString *)salt {
++ (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt {
     // Data of String to generate Hash key(hexa decimal string).
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *saltData;
-    if ([salt  isEqual: @""]) {
-        saltData = [salt dataUsingEncoding:NSUTF8StringEncoding];
-    } else {
-        uint8_t digest[CC_SHA1_DIGEST_LENGTH];
-        CC_SHA1(passwordData.bytes, (CC_LONG)passwordData.length, digest);
-        saltData = [NSData dataWithBytes:digest length:(NSUInteger)CC_SHA1_DIGEST_LENGTH];
-    }
+    NSData *saltData = [salt dataUsingEncoding:NSUTF8StringEncoding];
 
     // Hash key (hexa decimal) string data length.
-    NSMutableData *hashKeyData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
+    NSMutableData *hashKeyData = [NSMutableData dataWithLength:CC_SHA512_DIGEST_LENGTH];
 
     // Key Derivation using PBKDF2 algorithm.
-    int status = CCKeyDerivationPBKDF(kCCPBKDF2, passwordData.bytes, passwordData.length, saltData.bytes, saltData.length, kCCPRFHmacAlgSHA1, 20000, hashKeyData.mutableBytes, hashKeyData.length);
+    int status = CCKeyDerivationPBKDF(
+                    kCCPBKDF2,
+                    passwordData.bytes,
+                    passwordData.length,
+                    saltData.bytes,
+                    saltData.length,
+                    kCCPRFHmacAlgSHA512,
+                    5000,
+                    hashKeyData.mutableBytes,
+                    hashKeyData.length);
+
     if (status == kCCParamError) {
         NSLog(@"Key derivation error");
+        return @"";
     }
 
     return [hashKeyData base64EncodedStringWithOptions:0];
@@ -110,5 +114,12 @@
     return [nsdata base64EncodedStringWithOptions:0];
 }
 
++ (NSString *) sha512: (NSString *)input {
+    NSData* inputData = [input dataUsingEncoding:NSUTF8StringEncoding];
+    unsigned char* buffer = malloc(CC_SHA512_DIGEST_LENGTH);
+    CC_SHA512([inputData bytes], (CC_LONG)[inputData length], buffer);
+    NSData *nsdata = [NSData dataWithBytesNoCopy:buffer length:CC_SHA512_DIGEST_LENGTH freeWhenDone:YES];
+    return [nsdata base64EncodedStringWithOptions:0];
+}
 
 @end

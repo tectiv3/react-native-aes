@@ -38,11 +38,11 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key
     }
 }
 
-RCT_EXPORT_METHOD(generateKey:(NSString *)password salt:(NSString *)salt
+RCT_EXPORT_METHOD(pbkdf2:(NSString *)password salt:(NSString *)salt
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSError *error = nil;
-    NSString *data = [AesCrypt generateKey:password salt:salt];
+    NSString *data = [AesCrypt pbkdf2:password salt:salt];
     if (data == nil) {
         reject(@"keygen_fail", @"Key generation failed", error);
     } else {
@@ -74,4 +74,15 @@ RCT_EXPORT_METHOD(sha256:(NSString *)text
     }
 }
 
+RCT_EXPORT_METHOD(sha512:(NSString *)text
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
+    NSString *data = [AesCrypt sha512:text];
+    if (data == nil) {
+        reject(@"sha512_fail", @"Hash error", error);
+    } else {
+        resolve(data);
+    }
+}
 @end

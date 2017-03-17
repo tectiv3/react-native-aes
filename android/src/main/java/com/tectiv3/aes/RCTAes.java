@@ -57,9 +57,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void generateKey(String pwd, String salt, Callback success, Callback error) {
+    public void pbkdf2(String pwd, String salt, Callback success, Callback error) {
         try {
-            String strs = generateKey(pwd, salt);
+            String strs = pbkdf2(pwd, salt);
             success.invoke(strs);
         } catch (Exception e) {
             error.invoke(e.getMessage());
@@ -86,6 +86,16 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void sha512(String data, Callback success, Callback error) {
+        try {
+            String strs = sha512(data);
+            success.invoke(strs);
+        } catch (Exception e) {
+            error.invoke(e.getMessage());
+        }
+    }
+
     private static SecretKey getSecretKey(String pwd) {
         try {
             PBEKeySpec pbeKeySpec = new PBEKeySpec(pwd.toCharArray());
@@ -99,7 +109,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
-    private static String generateKey(String pwd, String salt) {
+    private static String pbkdf2(String pwd, String salt) {
         //placeholder for PBKDF2
         return pwd;
     }
