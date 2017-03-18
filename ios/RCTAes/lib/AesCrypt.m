@@ -13,6 +13,15 @@
 
 @implementation AesCrypt
 
++ (NSString *) toHex:(NSData *)nsdata {
+    NSString * hexStr = [NSString stringWithFormat:@"%@", nsdata];
+    
+    for(NSString * toRemove in [NSArray arrayWithObjects:@"<", @">", @" ", nil])
+        hexStr = [hexStr stringByReplacingOccurrencesOfString:toRemove withString:@""];
+    
+    return hexStr;
+}
+
 + (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt {
     // Data of String to generate Hash key(hexa decimal string).
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
@@ -38,7 +47,7 @@
         return @"";
     }
 
-    return [hashKeyData base64EncodedStringWithOptions:0];
+    return [self toHex:hashKeyData];
 }
 
 + (NSString *) encrypt: (NSString *)clearText  key: (NSString *)key {
@@ -103,7 +112,7 @@
     void* buffer = malloc(CC_SHA1_DIGEST_LENGTH);
     CCHmac(kCCHmacAlgSHA1, [keyData bytes], [keyData length], [inputData bytes], [inputData length], buffer);
     NSData *nsdata = [NSData dataWithBytesNoCopy:buffer length:CC_SHA1_DIGEST_LENGTH freeWhenDone:YES];
-    return [nsdata base64EncodedStringWithOptions:0];
+    return [self toHex:nsdata];
 }
 
 + (NSString *) sha256: (NSString *)input {
@@ -111,7 +120,7 @@
     unsigned char* buffer = malloc(CC_SHA256_DIGEST_LENGTH);
     CC_SHA256([inputData bytes], (CC_LONG)[inputData length], buffer);
     NSData *nsdata = [NSData dataWithBytesNoCopy:buffer length:CC_SHA256_DIGEST_LENGTH freeWhenDone:YES];
-    return [nsdata base64EncodedStringWithOptions:0];
+    return [self toHex:nsdata];
 }
 
 + (NSString *) sha512: (NSString *)input {
@@ -119,7 +128,7 @@
     unsigned char* buffer = malloc(CC_SHA512_DIGEST_LENGTH);
     CC_SHA512([inputData bytes], (CC_LONG)[inputData length], buffer);
     NSData *nsdata = [NSData dataWithBytesNoCopy:buffer length:CC_SHA512_DIGEST_LENGTH freeWhenDone:YES];
-    return [nsdata base64EncodedStringWithOptions:0];
+    return [self toHex:nsdata];
 }
 
 @end

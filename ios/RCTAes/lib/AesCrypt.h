@@ -14,4 +14,5 @@
 + (NSString *) hmac: (NSString *)input key: (NSString *)key;
 + (NSString *) sha256: (NSString *)input;
 + (NSString *) sha512: (NSString *)input;
++ (NSString *) toHex: (NSData *)nsdata;
 @end
