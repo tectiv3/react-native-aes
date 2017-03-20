@@ -67,9 +67,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void hmac(String data, String pwd, Callback success, Callback error) {
+    public void hmac256(String data, String pwd, Callback success, Callback error) {
         try {
-            String strs = hmac(data, pwd);
+            String strs = hmac256(data, pwd);
             success.invoke(strs);
         } catch (Exception e) {
             error.invoke(e.getMessage());
@@ -114,8 +114,8 @@ public class RCTAes extends ReactContextBaseJavaModule {
         return pwd;
     }
 
-    private static String hmac(String text, String key) {
-        //placeholder for HMAC
+    private static String hmac256(String text, String key) {
+        //placeholder for hmac256
         return pwd;
     }
 

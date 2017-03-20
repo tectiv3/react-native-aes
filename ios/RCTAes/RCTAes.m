@@ -50,11 +50,11 @@ RCT_EXPORT_METHOD(pbkdf2:(NSString *)password salt:(NSString *)salt
     }
 }
 
-RCT_EXPORT_METHOD(hmac:(NSString *)base64 key:(NSString *)key
+RCT_EXPORT_METHOD(hmac256:(NSString *)base64 key:(NSString *)key
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSError *error = nil;
-    NSString *data = [AesCrypt hmac:base64 key:key];
+    NSString *data = [AesCrypt hmac256:base64 key:key];
     if (data == nil) {
         reject(@"hmac_fail", @"HMAC error", error);
     } else {

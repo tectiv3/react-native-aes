@@ -62,7 +62,7 @@ try {
             Aes.decrypt(cipher, key).then(text => {
                 console.log("Decrypted:", text);
             });
-            Aes.hmac(cipher, key).then(hash => {
+            Aes.hmac256(cipher, key).then(hash => {
                 console.log("HMAC", hash);
             });
         });
@@ -91,6 +91,6 @@ async function decrypt(cipher, key) {
 - `encrypt(text, key)`
 - `decrypt(base64, key)`
 - `pbkdf2(text, salt)`
-- `hmac(cipher, key)`
+- `hmac256(cipher, key)`
 - `sha256(text)`
 - `sha512(text)`

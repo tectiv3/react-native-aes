@@ -11,7 +11,7 @@
 + (NSString *) encrypt: (NSString *)clearText  key: (NSString *)key;
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key;
 + (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt;
-+ (NSString *) hmac: (NSString *)input key: (NSString *)key;
++ (NSString *) hmac256: (NSString *)input key: (NSString *)key;
 + (NSString *) sha256: (NSString *)input;
 + (NSString *) sha512: (NSString *)input;
 + (NSString *) toHex: (NSData *)nsdata;
