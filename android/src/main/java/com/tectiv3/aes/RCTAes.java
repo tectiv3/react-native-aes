@@ -87,6 +87,16 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void sha1(String data, Callback success, Callback error) {
+        try {
+            String strs = sha1(data);
+            success.invoke(strs);
+        } catch (Exception e) {
+            error.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
     public void sha512(String data, Callback success, Callback error) {
         try {
             String strs = sha512(data);

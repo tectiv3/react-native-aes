@@ -92,5 +92,6 @@ async function decrypt(cipher, key) {
 - `decrypt(base64, key)`
 - `pbkdf2(text, salt)`
 - `hmac256(cipher, key)`
+- `sha1(text)`
 - `sha256(text)`
 - `sha512(text)`
