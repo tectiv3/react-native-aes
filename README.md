@@ -57,9 +57,10 @@ var Aes = NativeModules.Aes;
 try {
     Aes.pbkdf2("Arnold", "salt").then(key => {
         console.log('Key:', key);
-        Aes.encrypt("These violent delights have violent ends", key).then(cipher => {
+        var iv = "random string";
+        Aes.encrypt("These violent delights have violent ends", key, iv).then(cipher => {
             console.log("Encrypted: ", cipher);
-            Aes.decrypt(cipher, key).then(text => {
+            Aes.decrypt(cipher, key, iv).then(text => {
                 console.log("Decrypted:", text);
             });
             Aes.hmac256(cipher, key).then(hash => {
@@ -88,8 +89,8 @@ async function decrypt(cipher, key) {
 
 ### methods
 
-- `encrypt(text, key)`
-- `decrypt(base64, key)`
+- `encrypt(text, key, iv)`
+- `decrypt(base64, key, iv)`
 - `pbkdf2(text, salt)`
 - `hmac256(cipher, key)`
 - `sha1(text)`

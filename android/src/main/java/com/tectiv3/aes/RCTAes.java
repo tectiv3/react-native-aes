@@ -47,9 +47,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decrypt(String data, String pwd, Callback success, Callback error) {
+    public void decrypt(String data, String pwd, String iv, Callback success, Callback error) {
         try {
-            String strs = decrypt(data, pwd);
+            String strs = decrypt(data, pwd, iv);
             success.invoke(strs);
         } catch (Exception e) {
             error.invoke(e.getMessage());
