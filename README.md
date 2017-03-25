@@ -76,9 +76,9 @@ try {
 #### Or
 
 ```js
-async function decrypt(cipher, key) {
+async function decrypt(cipher, key, iv) {
     try {
-        var text = await Aes.decrypt(cipher, key);
+        var text = await Aes.decrypt(cipher, key, iv);
         console.log(text);
         return text;
     } catch (e) {
