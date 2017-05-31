@@ -7,10 +7,12 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.security.MessageDigest;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 
 import android.util.Base64;
 
@@ -23,7 +25,7 @@ import com.facebook.react.bridge.Callback;
 
 public class RCTAes extends ReactContextBaseJavaModule {
 
-    private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
     private static final String KEY_ALGORITHM = "AES";
     private static final String SECRET_KEY_ALGORITHM = "PBEWithSHA256And256BitAES-CBC-BC";
 
@@ -37,9 +39,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encrypt(String data, String pwd, Callback success, Callback error) {
+    public void encrypt(String data, String keyBase64, String ivBase64, Callback success, Callback error) {
         try {
-            String result = encrypt(data, pwd);
+            String result = encrypt(data, keyBase64, ivBase64);
             success.invoke(result);
         } catch (Exception e) {
             error.invoke(e.getMessage());
@@ -79,8 +81,8 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void sha256(String data, Callback success, Callback error) {
         try {
-            String strs = sha256(data);
-            success.invoke(strs);
+            String result = shaX(data, "SHA-256");
+            success.invoke(result);
         } catch (Exception e) {
             error.invoke(e.getMessage());
         }
@@ -89,8 +91,8 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void sha1(String data, Callback success, Callback error) {
         try {
-            String strs = sha1(data);
-            success.invoke(strs);
+            String result = shaX(data, "SHA-1");
+            success.invoke(result);
         } catch (Exception e) {
             error.invoke(e.getMessage());
         }
@@ -99,24 +101,19 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void sha512(String data, Callback success, Callback error) {
         try {
-            String strs = sha512(data);
-            success.invoke(strs);
+            String result = shaX(data, "SHA-512");
+            success.invoke(result);
         } catch (Exception e) {
             error.invoke(e.getMessage());
         }
     }
 
-    private static SecretKey getSecretKey(String pwd) {
-        try {
-            PBEKeySpec pbeKeySpec = new PBEKeySpec(pwd.toCharArray());
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_KEY_ALGORITHM);
-            SecretKey tmp = factory.generateSecret(pbeKeySpec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), KEY_ALGORITHM);
-            return secret;
-        }
-        catch (Exception e) {
-            return null;
-        }
+    private String shaX(String data, String algorithm) throws Exception {
+        MessageDigest md = MessageDigest.getInstance(algorithm);
+        md.update(data.getBytes());
+        byte[] digest = md.digest();
+
+        return Base64.encodeToString(digest, Base64.DEFAULT);
     }
 
     private static String pbkdf2(String pwd, String salt) {
@@ -126,41 +123,48 @@ public class RCTAes extends ReactContextBaseJavaModule {
 
     private static String hmac256(String text, String key) {
         //placeholder for hmac256
-        return pwd;
+        return text;
     }
 
-    private static String encrypt(String text, String pwd) {
-        Thread.sleep(randomInt.nextInt(100));
+    private static String encrypt(String text, String keyBase64, String ivBase64) throws Exception {
         if (text == null || text.length() == 0) {
             return null;
         }
-        byte[] encrypted = null;
-        try {
-            SecureRandom sr = new SecureRandom();
-            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(pwd), sr);
-            encrypted = cipher.doFinal(text.getBytes("UTF-8"));
+
+        byte[] ivBytes = Base64.decode(ivBase64, Base64.DEFAULT);
+        if (ivBytes.length != 16) {
+            throw new RuntimeException("iv must be 16 bytes length, but it is " + ivBytes.length);
         }
-        catch (Exception e) {
-            return null;
-        }
+
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        SecretKey secretKey = getSecretKey(keyBase64);
+        IvParameterSpec iv = new IvParameterSpec(ivBytes);
+        SecureRandom sr = new SecureRandom();
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv, sr);
+        byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
         return Base64.encodeToString(encrypted, Base64.DEFAULT);
     }
 
-    private static String decrypt(String code) {
-        Thread.sleep(randomInt.nextInt(100));
+    private static String decrypt(String code, String keyBase64, String ivBase64) throws Exception {
         if(code == null || code.length() == 0) {
             return null;
         }
-        byte[] decrypted = null;
-        try {
-            SecureRandom sr = new SecureRandom();
-            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(pwd), cr);
-            decrypted = cipher.doFinal(Base64.decode(code, Base64.DEFAULT));
+
+        byte[] ivBytes = Base64.decode(ivBase64, Base64.DEFAULT);
+        if (ivBytes.length != 16) {
+            throw new RuntimeException("iv must be 16 bytes length, but it is " + ivBytes.length);
         }
-        catch (Exception e) {
-            return null;
-        }
+
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        SecretKey secretKey = getSecretKey(keyBase64);
+        IvParameterSpec iv = new IvParameterSpec(ivBytes);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
+        byte[] decrypted = cipher.doFinal(Base64.decode(code, Base64.DEFAULT));
         return new String(decrypted, "UTF-8");
     }
 
+    private static SecretKey getSecretKey(String keyBase64) throws Exception {
+        return new SecretKeySpec(Base64.decode(keyBase64, Base64.DEFAULT), KEY_ALGORITHM);
+    }
 }
+
