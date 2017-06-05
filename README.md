@@ -51,18 +51,29 @@ protected List<ReactPackage> getPackages() {
 ### Example
 
 ```js
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 var Aes = NativeModules.Aes;
 
+
+const generateKey = (password, salt) => Aes.pbkdf2(password, salt);
+
+const encrypt = (text, keyBase64) => {
+    var ivBase64 = "base64 random 16 bytes string";
+    return Aes.encrypt(text, keyBase64, ivBase64).then(cipher => ({ cipher, iv: ivBase64 }));
+};
+
+const decrypt = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv);
+
 try {
-    Aes.pbkdf2("Arnold", "salt").then(key => {
+    generateKey("Arnold", "salt").then(key => {
         console.log('Key:', key);
-        var iv = "random string";
-        Aes.encrypt("These violent delights have violent ends", key, iv).then(cipher => {
+        encrypt("These violent delights have violent ends", key).then(({cipher, iv}) => {
             console.log("Encrypted: ", cipher);
-            Aes.decrypt(cipher, key, iv).then(text => {
+            
+            decrypt({ cipher, iv }, key).then(text => {
                 console.log("Decrypted:", text);
             });
+            
             Aes.hmac256(cipher, key).then(hash => {
                 console.log("HMAC", hash);
             });
@@ -76,9 +87,9 @@ try {
 #### Or
 
 ```js
-async function decrypt(cipher, key, iv) {
+async function asyncDecrypt(cipher, key, iv) {
     try {
-        var text = await Aes.decrypt(cipher, key, iv);
+        var text = await decrypt({ cipher, iv }, key);
         console.log(text);
         return text;
     } catch (e) {
