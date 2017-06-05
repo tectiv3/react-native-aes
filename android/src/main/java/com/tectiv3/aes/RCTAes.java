@@ -18,6 +18,7 @@ import android.util.Base64;
 
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -39,72 +40,72 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encrypt(String data, String keyBase64, String ivBase64, Callback success, Callback error) {
+    public void encrypt(String data, String keyBase64, String ivBase64, Promise promise) {
         try {
             String result = encrypt(data, keyBase64, ivBase64);
-            success.invoke(result);
+            promise.resolve(result);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 
     @ReactMethod
-    public void decrypt(String data, String pwd, String iv, Callback success, Callback error) {
+    public void decrypt(String data, String pwd, String iv, Promise promise) {
         try {
             String strs = decrypt(data, pwd, iv);
-            success.invoke(strs);
+            promise.resolve(strs);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 
     @ReactMethod
-    public void pbkdf2(String pwd, String salt, Callback success, Callback error) {
+    public void pbkdf2(String pwd, String salt, Promise promise) {
         try {
             String strs = pbkdf2(pwd, salt);
-            success.invoke(strs);
+            promise.resolve(strs);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 
     @ReactMethod
-    public void hmac256(String data, String pwd, Callback success, Callback error) {
+    public void hmac256(String data, String pwd, Promise promise) {
         try {
             String strs = hmac256(data, pwd);
-            success.invoke(strs);
+            promise.resolve(strs);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 
     @ReactMethod
-    public void sha256(String data, Callback success, Callback error) {
+    public void sha256(String data, Promise promise) {
         try {
             String result = shaX(data, "SHA-256");
-            success.invoke(result);
+            promise.resolve(result);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 
     @ReactMethod
-    public void sha1(String data, Callback success, Callback error) {
+    public void sha1(String data, Promise promise) {
         try {
             String result = shaX(data, "SHA-1");
-            success.invoke(result);
+            promise.resolve(result);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 
     @ReactMethod
-    public void sha512(String data, Callback success, Callback error) {
+    public void sha512(String data, Promise promise) {
         try {
             String result = shaX(data, "SHA-512");
-            success.invoke(result);
+            promise.resolve(result);
         } catch (Exception e) {
-            error.invoke(e.getMessage());
+            promise.reject("-1", e.getMessage());
         }
     }
 

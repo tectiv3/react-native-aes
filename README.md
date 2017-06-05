@@ -55,40 +55,14 @@ import { NativeModules, Platform } from 'react-native';
 var Aes = NativeModules.Aes;
 
 
-const generateKey = (password, salt) => {
-    if (Platform.OS === 'ios') {
-        return Aes.pbkdf2(password, salt);
-    }
-        
-    return new Promise((resolve, reject) => {
-        Aes.pbkdf2(password, salt, key => resolve(key), error => reject(error));
-    });
-};
+const generateKey = (password, salt) => Aes.pbkdf2(password, salt);
 
 const encrypt = (text, keyBase64) => {
     var ivBase64 = "base64 random 16 bytes string";
-    if (Platform.OS === 'ios') {
-        return Aes.encrypt(text, keyBase64, ivBase64).then(cipher => ({ cipher, iv: ivBase64 }));
-    } else {
-        return new Promise((resolve, reject) => {
-            Aes.encrypt(text, keyBase64, ivBase64, cipher => resolve({ cipher, iv: ivBase64 }), error => reject(error));
-        });
-    }    
+    return Aes.encrypt(text, keyBase64, ivBase64).then(cipher => ({ cipher, iv: ivBase64 }));
 };
 
-const decrypt = (encryptedData, key) => {
-    if (Platform.OS === 'ios') {
-        return Aes.decrypt(encryptedData.cipher, key, encryptedData.iv);
-    } else {
-        return new Promise((resolve, reject) => {
-            Aes.decrypt(
-                encryptedData.cipher, key, encryptedData.iv,
-                decryptedData => resolve(decryptedData),
-                error => reject(error)
-            );
-        });
-    }    
-};
+const decrypt = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv);
 
 try {
     generateKey("Arnold", "salt").then(key => {
