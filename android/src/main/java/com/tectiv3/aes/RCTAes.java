@@ -7,12 +7,27 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.UUID;
+
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.InvalidKeyException;
+
+import java.nio.charset.StandardCharsets;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.Mac;
+
+import org.spongycastle.crypto.digests.SHA512Digest;
+import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.spongycastle.crypto.params.KeyParameter;
+import org.spongycastle.util.encoders.Hex;
 
 import android.util.Base64;
 
@@ -27,6 +42,7 @@ import com.facebook.react.bridge.Callback;
 public class RCTAes extends ReactContextBaseJavaModule {
 
     private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
+    public static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String KEY_ALGORITHM = "AES";
     private static final String SECRET_KEY_ALGORITHM = "PBEWithSHA256And256BitAES-CBC-BC";
 
@@ -60,9 +76,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void pbkdf2(String pwd, String salt, Promise promise) {
+    public void pbkdf2(String pwd, String salt, Integer cost, Integer length, Promise promise) {
         try {
-            String strs = pbkdf2(pwd, salt);
+            String strs = pbkdf2(pwd, salt, cost, length);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -109,6 +125,29 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void randomUuid(Promise promise) {
+        try {
+            String result = UUID.randomUUID().toString();
+            promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject("-1", e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void randomKey(Integer length, Promise promise) {
+        try {
+            byte[] key = new byte[length];
+            SecureRandom rand = new SecureRandom();
+            rand.nextBytes(key);
+            String keyHex = bytesToHex(key);
+            promise.resolve(keyHex);
+        } catch (Exception e) {
+            promise.reject("-1", e.getMessage());
+        }
+    }
+
     private String shaX(String data, String algorithm) throws Exception {
         MessageDigest md = MessageDigest.getInstance(algorithm);
         md.update(data.getBytes());
@@ -117,55 +156,63 @@ public class RCTAes extends ReactContextBaseJavaModule {
         return Base64.encodeToString(digest, Base64.DEFAULT);
     }
 
-    private static String pbkdf2(String pwd, String salt) {
-        //placeholder for PBKDF2
-        return pwd;
+    public static String bytesToHex(byte[] bytes) {
+        final char[] hexArray = "0123456789abcdef".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
-    private static String hmac256(String text, String key) {
-        //placeholder for hmac256
-        return text;
+    private static String pbkdf2(String pwd, String salt, Integer cost, Integer length)
+    throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA512Digest());
+        gen.init(pwd.getBytes(StandardCharsets.UTF_8), salt.getBytes(StandardCharsets.UTF_8), cost);
+        byte[] key = ((KeyParameter) gen.generateDerivedParameters(length)).getKey();
+        return bytesToHex(key);
     }
 
-    private static String encrypt(String text, String keyBase64, String ivBase64) throws Exception {
+    private static String hmac256(String text, String key) throws NoSuchAlgorithmException, InvalidKeyException  {
+        byte[] contentData = text.getBytes(StandardCharsets.UTF_8);
+        byte[] akHexData = Hex.decode(key);
+        Mac sha256_HMAC = Mac.getInstance(HMAC_SHA_256);
+        SecretKey secret_key = new SecretKeySpec(akHexData, HMAC_SHA_256);
+        sha256_HMAC.init(secret_key);
+        return bytesToHex(sha256_HMAC.doFinal(contentData));
+    }
+
+    final static IvParameterSpec emptyIvSpec = new IvParameterSpec(new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+
+    private static String encrypt(String text, String hexKey, String hexIv) throws Exception {
         if (text == null || text.length() == 0) {
             return null;
         }
 
-        byte[] ivBytes = Base64.decode(ivBase64, Base64.DEFAULT);
-        if (ivBytes.length != 16) {
-            throw new RuntimeException("iv must be 16 bytes length, but it is " + ivBytes.length);
-        }
+        byte[] key = Hex.decode(hexKey);
+        SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
 
         Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        SecretKey secretKey = getSecretKey(keyBase64);
-        IvParameterSpec iv = new IvParameterSpec(ivBytes);
-        SecureRandom sr = new SecureRandom();
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv, sr);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, hexIv == null ? emptyIvSpec : new IvParameterSpec(Hex.decode(hexIv)));
         byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
-        return Base64.encodeToString(encrypted, Base64.DEFAULT);
+        return Base64.encodeToString(encrypted, Base64.NO_WRAP);
     }
 
-    private static String decrypt(String code, String keyBase64, String ivBase64) throws Exception {
-        if(code == null || code.length() == 0) {
+    private static String decrypt(String ciphertext, String hexKey, String hexIv) throws Exception {
+        if(ciphertext == null || ciphertext.length() == 0) {
             return null;
         }
 
-        byte[] ivBytes = Base64.decode(ivBase64, Base64.DEFAULT);
-        if (ivBytes.length != 16) {
-            throw new RuntimeException("iv must be 16 bytes length, but it is " + ivBytes.length);
-        }
+        byte[] key = Hex.decode(hexKey);
+        SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
 
         Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        SecretKey secretKey = getSecretKey(keyBase64);
-        IvParameterSpec iv = new IvParameterSpec(ivBytes);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
-        byte[] decrypted = cipher.doFinal(Base64.decode(code, Base64.DEFAULT));
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, hexIv == null ? emptyIvSpec : new IvParameterSpec(Hex.decode(hexIv)));
+        byte[] decrypted = cipher.doFinal(Base64.decode(ciphertext, Base64.NO_WRAP));
         return new String(decrypted, "UTF-8");
     }
 
-    private static SecretKey getSecretKey(String keyBase64) throws Exception {
-        return new SecretKeySpec(Base64.decode(keyBase64, Base64.DEFAULT), KEY_ALGORITHM);
-    }
 }
-
