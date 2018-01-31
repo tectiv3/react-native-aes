@@ -1,3 +1,3 @@
 'use strict';
 import { NativeModules } from 'react-native';
-export const Aes = NativeModules.Aes;
+export default NativeModules.Aes;
