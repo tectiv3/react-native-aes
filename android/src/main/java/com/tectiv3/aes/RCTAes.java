@@ -80,7 +80,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void pbkdf2(String pwd, String salt, Promise promise) {
         try {
-            String strs = pbkdf2(pwd, salt, ROUNDS, SHA512_DIGEST_LENGTH);
+            String strs = pbkdf2(pwd, salt, ROUNDS, 128);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
