@@ -39,7 +39,7 @@
     NSData *saltData = [salt dataUsingEncoding:NSUTF8StringEncoding];
 
     // Hash key (hexa decimal) string data length.
-    NSMutableData *hashKeyData = [NSMutableData dataWithLength:CC_SHA512_DIGEST_LENGTH];
+    NSMutableData *hashKeyData = [NSMutableData dataWithLength:16];
 
     // Key Derivation using PBKDF2 algorithm.
     int status = CCKeyDerivationPBKDF(
