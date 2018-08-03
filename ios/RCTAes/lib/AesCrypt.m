@@ -62,22 +62,22 @@
 }
 
 + (NSData *) AES128CBC: (NSString *)operation data: (NSData *)data key: (NSString *)key iv: (NSString *)iv {
-    //convert hex string to hex data
+    // Convert hex string to hex data.
     NSData *keyData = [self fromHex:key];
     NSData *ivData = [self fromHex:iv];
-    //    NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
     size_t numBytes = 0;
-
-    NSMutableData * buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES128];
+    NSMutableData *buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES128];
 
     CCCryptorStatus cryptStatus = CCCrypt(
                                           [operation isEqualToString:@"encrypt"] ? kCCEncrypt : kCCDecrypt,
                                           kCCAlgorithmAES128,
                                           kCCOptionPKCS7Padding,
-                                          keyData.bytes, keyData.length,
+                                          keyData.bytes,
+                                          kCCKeySizeAES128,
                                           ivData.bytes,
                                           data.bytes, data.length,
-                                          buffer.mutableBytes,  buffer.length,
+                                          buffer.mutableBytes,
+                                          buffer.length,
                                           &numBytes);
 
     if (cryptStatus == kCCSuccess) {

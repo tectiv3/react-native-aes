@@ -61,50 +61,47 @@ protected List<ReactPackage> getPackages() {
 ### Example
 
 ```js
-import { Platform } from 'react-native';
-import Aes from 'react-native-aes-crypto'
+import AES from 'react-native-aes-crypto';
 
-const generateKey = (password, salt) => Aes.pbkdf2(password, salt);
-
-const encrypt = (text, keyBase64) => {
-    var ivBase64 = "base64 random 16 bytes string";
-    return Aes.encrypt(text, keyBase64, ivBase64).then(cipher => ({ cipher, iv: ivBase64 }));
-};
-
-const decrypt = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv);
-
-try {
-    generateKey("Arnold", "salt").then(key => {
-        console.log('Key:', key);
-        encrypt("These violent delights have violent ends", key).then(({cipher, iv}) => {
-            console.log("Encrypted: ", cipher);
-            
-            decrypt({ cipher, iv }, key).then(text => {
-                console.log("Decrypted:", text);
-            });
-            
-            Aes.hmac256(cipher, key).then(hash => {
-                console.log("HMAC", hash);
-            });
-        });
-    });
-} catch (e) {
-    console.error(e);
+function generateKey(password, salt) {
+    return AES.pbkdf2(password, salt);
 }
-```
 
-#### Or
-
-```js
-async function asyncDecrypt(cipher, key, iv) {
+async function encrypt(text, key) {
+    const iv = 'base 64 random 16 bytes string';
     try {
-        var text = await decrypt({ cipher, iv }, key);
-        console.log(text);
-        return text;
-    } catch (e) {
-        console.error(e);
+        const ciphertext = await AES.encrypt(text, key, iv);
+        return { ciphertext, iv };
+    } catch (error) {
+        throw error;
     }
 }
+
+function decrypt(ciphertext, key, iv) {
+    return AES.decrypt(ciphertext, key, iv);
+}
+
+function hmac(ciphertext, key) {
+    return AES.hmac256(ciphertext, key);
+}
+
+(async () => {
+    try {
+        const generatedKey = await generateKey('password', 'salt');
+        console.log(`generatedKey: ${generatedKey}`);
+
+        const { ciphertext, iv } = await encrypt('Hello, world!', generatedKey);
+        console.log(`ciphertext: ${ciphertext}, iv: ${iv}`);
+
+        const decryptedText = await decrypt(ciphertext, generatedKey, iv);
+        console.log(`decrypted: ${decryptedText}`);
+
+        const hash = await hmac(ciphertext, generatedKey);
+        console.log(`hash: ${hash}`);
+    } catch (error) {
+        throw error;
+    }
+})();
 ```
 
 ### methods
