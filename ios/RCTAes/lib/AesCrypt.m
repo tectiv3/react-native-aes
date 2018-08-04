@@ -33,13 +33,13 @@
     return data;
 }
 
-+ (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt {
++ (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt cost: (NSInteger)cost length: (NSInteger)length {
     // Data of String to generate Hash key(hexa decimal string).
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
     NSData *saltData = [salt dataUsingEncoding:NSUTF8StringEncoding];
 
     // Hash key (hexa decimal) string data length.
-    NSMutableData *hashKeyData = [NSMutableData dataWithLength:CC_SHA512_DIGEST_LENGTH];
+    NSMutableData *hashKeyData = [NSMutableData dataWithLength:length/8];
 
     // Key Derivation using PBKDF2 algorithm.
     int status = CCKeyDerivationPBKDF(
@@ -49,7 +49,7 @@
                     saltData.bytes,
                     saltData.length,
                     kCCPRFHmacAlgSHA512,
-                    5000,
+                    cost,
                     hashKeyData.mutableBytes,
                     hashKeyData.length);
 
@@ -74,7 +74,7 @@
                                           [operation isEqualToString:@"encrypt"] ? kCCEncrypt : kCCDecrypt,
                                           kCCAlgorithmAES128,
                                           kCCOptionPKCS7Padding,
-                                          keyData.bytes, keyData.length,
+                                          keyData.bytes, kCCKeySizeAES256,
                                           ivData.bytes,
                                           data.bytes, data.length,
                                           buffer.mutableBytes,  buffer.length,
@@ -128,6 +128,19 @@
     CC_SHA512([inputData bytes], (CC_LONG)[inputData length], buffer);
     NSData *result = [NSData dataWithBytesNoCopy:buffer length:CC_SHA512_DIGEST_LENGTH freeWhenDone:YES];
     return [self toHex:result];
+}
+
++ (NSString *) randomUuid {
+  return [[NSUUID UUID] UUIDString];
+}
+
++ (NSString *) randomKey: (NSInteger)length {
+    NSMutableData *data = [NSMutableData dataWithLength:length];
+    int result = SecRandomCopyBytes(kSecRandomDefault, length, data.mutableBytes);
+    if (result != noErr) {
+        return nil;
+    }
+    return [self toHex:data];
 }
 
 @end

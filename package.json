@@ -1,10 +1,10 @@
 {
     "name": "react-native-aes-crypto",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "description": "AES crypto native module for react-native",
     "main": "index.js",
     "author": "tectiv3",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "keywords": [
         "react-native",
         "react-component",
@@ -18,7 +18,8 @@
         "sha256",
         "sha512",
         "pbkdf2",
-        "hmac256"
+        "hmac256",
+        "uuid"
     ],
     "homepage": "https://github.com/tectiv3/react-native-aes",
     "bugs": {

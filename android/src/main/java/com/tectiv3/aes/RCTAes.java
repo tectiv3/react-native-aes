@@ -45,8 +45,6 @@ public class RCTAes extends ReactContextBaseJavaModule {
     public static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String KEY_ALGORITHM = "AES";
     private static final String SECRET_KEY_ALGORITHM = "PBEWithSHA256And256BitAES-CBC-BC";
-    private static final Integer ROUNDS = 5000;
-    private static final Integer SHA512_DIGEST_LENGTH = 64;
 
     public RCTAes(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -78,9 +76,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void pbkdf2(String pwd, String salt, Promise promise) {
+    public void pbkdf2(String pwd, String salt, Integer cost, Integer length, Promise promise) {
         try {
-            String strs = pbkdf2(pwd, salt, ROUNDS, SHA512_DIGEST_LENGTH);
+            String strs = pbkdf2(pwd, salt, cost, length);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -154,8 +152,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
         MessageDigest md = MessageDigest.getInstance(algorithm);
         md.update(data.getBytes());
         byte[] digest = md.digest();
-
-        return Base64.encodeToString(digest, Base64.DEFAULT);
+        return bytesToHex(digest);
     }
 
     public static String bytesToHex(byte[] bytes) {

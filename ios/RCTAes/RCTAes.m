@@ -39,10 +39,11 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key iv:(NSString *)
 }
 
 RCT_EXPORT_METHOD(pbkdf2:(NSString *)password salt:(NSString *)salt
+                  cost:(NSInteger)cost length:(NSInteger)length
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSError *error = nil;
-    NSString *data = [AesCrypt pbkdf2:password salt:salt];
+    NSString *data = [AesCrypt pbkdf2:password salt:salt cost:cost length:length];
     if (data == nil) {
         reject(@"keygen_fail", @"Key generation failed", error);
     } else {
@@ -97,4 +98,28 @@ RCT_EXPORT_METHOD(sha512:(NSString *)text
         resolve(data);
     }
 }
+
+RCT_EXPORT_METHOD(randomUuid:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
+    NSString *data = [AesCrypt randomUuid];
+    if (data == nil) {
+        reject(@"uuid_fail", @"Uuid error", error);
+    } else {
+        resolve(data);
+    }
+}
+
+RCT_EXPORT_METHOD(randomKey:(NSInteger)length
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
+    NSString *data = [AesCrypt randomKey:length];
+    if (data == nil) {
+        reject(@"random_fail", @"Random key error", error);
+    } else {
+        resolve(data);
+    }
+}
+
 @end

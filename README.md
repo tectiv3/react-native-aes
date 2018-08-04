@@ -4,26 +4,20 @@ AES encryption/decryption for react-native
 
 ## Installation
 ```sh
-npm install react-native-aes-crypto
+npm install --save react-native-aes-crypto
 ```
 or
 ```sh
 yarn add react-native-aes-crypto
 ```
-### Linking Automatically
-```sh
-react-native link
-```
-### Linking Manually
-
-#### iOS
+### Installation (iOS)
 * See [Linking Libraries](http://facebook.github.io/react-native/docs/linking-libraries-ios.html)
 OR
 * Drag RCTAes.xcodeproj to your project on Xcode.
 * Click on your main project file (the one that represents the .xcodeproj) select Build Phases and drag libRCTAes.a from the Products folder inside the RCTAes.xcodeproj.
 
-#### (Android)
-##### Untested!
+### Installation (Android)
+#### Untested!
 ```gradle
 ...
 include ':react-native-aes'
@@ -61,10 +55,11 @@ protected List<ReactPackage> getPackages() {
 ### Example
 
 ```js
-import { Platform } from 'react-native';
-import Aes from 'react-native-aes-crypto'
+import { NativeModules, Platform } from 'react-native';
+var Aes = NativeModules.Aes;
 
-const generateKey = (password, salt) => Aes.pbkdf2(password, salt);
+
+const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length);
 
 const encrypt = (text, keyBase64) => {
     var ivBase64 = "base64 random 16 bytes string";
@@ -74,7 +69,7 @@ const encrypt = (text, keyBase64) => {
 const decrypt = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv);
 
 try {
-    generateKey("Arnold", "salt").then(key => {
+    generateKey("Arnold", "salt", 5000, 512).then(key => {
         console.log('Key:', key);
         encrypt("These violent delights have violent ends", key).then(({cipher, iv}) => {
             console.log("Encrypted: ", cipher);
@@ -86,6 +81,8 @@ try {
             Aes.hmac256(cipher, key).then(hash => {
                 console.log("HMAC", hash);
             });
+        }).catch(error => {
+            console.log(error);
         });
     });
 } catch (e) {
@@ -111,8 +108,10 @@ async function asyncDecrypt(cipher, key, iv) {
 
 - `encrypt(text, key, iv)`
 - `decrypt(base64, key, iv)`
-- `pbkdf2(text, salt)`
+- `pbkdf2(text, salt, cost, length)`
 - `hmac256(cipher, key)`
 - `sha1(text)`
 - `sha256(text)`
 - `sha512(text)`
+- `randomUuid()`
+- `randomKey(length)`
