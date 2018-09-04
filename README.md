@@ -20,8 +20,8 @@ OR
 #### Untested!
 ```gradle
 ...
-include ':react-native-aes'
-project(':react-native-aes').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-aes/android/RCTAes')
+include ':react-native-aes-crypto'
+project(':react-native-aes-crypto').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-aes-crypto/android')
 ```
 
 * In `android/app/build.gradle`
@@ -30,7 +30,7 @@ project(':react-native-aes').projectDir = new File(rootProject.projectDir, '../n
 ...
 dependencies {
     ...
-    compile project(':react-native-aes')
+    compile project(':react-native-aes-crypto')
 }
 ```
 
