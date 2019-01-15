@@ -72,10 +72,12 @@ try {
     generateKey("Arnold", "salt", 5000, 512).then(key => {
         console.log('Key:', key);
         encrypt("These violent delights have violent ends", key).then(({cipher, iv}) => {
-            console.log("Encrypted: ", cipher);
+            console.log("Encrypted:", cipher);
             
             decrypt({ cipher, iv }, key).then(text => {
                 console.log("Decrypted:", text);
+            }).catch(error => {
+                console.log(error);
             });
             
             Aes.hmac256(cipher, key).then(hash => {
