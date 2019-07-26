@@ -9,13 +9,4 @@ module.exports = {
     jsxBracketSameLine: false,
     arrowParens: 'avoid',
     proseWrap: 'never',
-    overrides: [
-        {
-            files: '*.vue',
-            options: {
-                printWidth: 100,
-            },
-            parser: 'vue',
-        },
-    ],
 }

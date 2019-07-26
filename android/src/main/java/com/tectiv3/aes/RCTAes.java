@@ -44,7 +44,6 @@ public class RCTAes extends ReactContextBaseJavaModule {
     private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
     public static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String KEY_ALGORITHM = "AES";
-    private static final String SECRET_KEY_ALGORITHM = "PBEWithSHA256And256BitAES-CBC-BC";
 
     public RCTAes(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -56,9 +55,9 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encrypt(String data, String keyBase64, String ivBase64, Promise promise) {
+    public void encrypt(String data, String key, String iv, Promise promise) {
         try {
-            String result = encrypt(data, keyBase64, ivBase64);
+            String result = encrypt(data, key, iv);
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());

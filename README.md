@@ -66,9 +66,9 @@ var Aes = NativeModules.Aes
 
 const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length)
 
-const encrypt = (text, keyBase64) => {
+const encrypt = (text, key) => {
     return Aes.randomKey(32).then(iv => {
-        return Aes.encrypt(text, keyBase64, iv).then(cipher => ({
+        return Aes.encrypt(text, key, iv).then(cipher => ({
             cipher,
             iv,
         }))
