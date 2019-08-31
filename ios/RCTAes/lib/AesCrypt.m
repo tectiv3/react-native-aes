@@ -75,7 +75,7 @@
                                           kCCAlgorithmAES128,
                                           kCCOptionPKCS7Padding,
                                           keyData.bytes, kCCKeySizeAES256,
-                                          ivData.bytes,
+                                          ivData.length ? ivData.bytes : nil,
                                           data.bytes, data.length,
                                           buffer.mutableBytes,  buffer.length,
                                           &numBytes);
