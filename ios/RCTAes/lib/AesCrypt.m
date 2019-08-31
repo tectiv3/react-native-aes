@@ -61,20 +61,20 @@
     return [self toHex:hashKeyData];
 }
 
-+ (NSData *) AES128CBC: (NSString *)operation data: (NSData *)data key: (NSString *)key iv: (NSString *)iv {
++ (NSData *) AES256CBC: (NSString *)operation data: (NSData *)data key: (NSString *)key iv: (NSString *)iv {
     //convert hex string to hex data
     NSData *keyData = [self fromHex:key];
     NSData *ivData = [self fromHex:iv];
     //    NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
     size_t numBytes = 0;
 
-    NSMutableData * buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES128];
+    NSMutableData * buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES256];
 
     CCCryptorStatus cryptStatus = CCCrypt(
                                           [operation isEqualToString:@"encrypt"] ? kCCEncrypt : kCCDecrypt,
-                                          kCCAlgorithmAES128,
+                                          kCCAlgorithmAES256,
                                           kCCOptionPKCS7Padding,
-                                          keyData.bytes, kCCKeySizeAES128,
+                                          keyData.bytes, kCCKeySizeAES256,
                                           ivData.bytes,
                                           data.bytes, data.length,
                                           buffer.mutableBytes,  buffer.length,
@@ -89,12 +89,12 @@
 }
 
 + (NSString *) encrypt: (NSString *)clearText key: (NSString *)key iv: (NSString *)iv {
-    NSData *result = [self AES128CBC:@"encrypt" data:[clearText dataUsingEncoding:NSUTF8StringEncoding] key:key iv:iv];
+    NSData *result = [self AES256CBC:@"encrypt" data:[clearText dataUsingEncoding:NSUTF8StringEncoding] key:key iv:iv];
     return [result base64EncodedStringWithOptions:0];
 }
 
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key iv: (NSString *)iv {
-    NSData *result = [self AES128CBC:@"decrypt" data:[[NSData alloc] initWithBase64EncodedString:cipherText options:0] key:key iv:iv];
+    NSData *result = [self AES256CBC:@"decrypt" data:[[NSData alloc] initWithBase64EncodedString:cipherText options:0] key:key iv:iv];
     return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
 }
 
