@@ -68,11 +68,11 @@
     //    NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
     size_t numBytes = 0;
 
-    NSMutableData * buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES256];
+    NSMutableData * buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES128];
 
     CCCryptorStatus cryptStatus = CCCrypt(
                                           [operation isEqualToString:@"encrypt"] ? kCCEncrypt : kCCDecrypt,
-                                          kCCAlgorithmAES256,
+                                          kCCAlgorithmAES128,
                                           kCCOptionPKCS7Padding,
                                           keyData.bytes, kCCKeySizeAES256,
                                           ivData.bytes,
