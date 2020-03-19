@@ -16,13 +16,24 @@ yarn add react-native-aes-crypto
 
 ### Installation (iOS)
 
--   See [Linking Libraries](http://facebook.github.io/react-native/docs/linking-libraries-ios.html) OR
--   Drag RCTAes.xcodeproj to your project on Xcode.
--   Click on your main project file (the one that represents the .xcodeproj) select Build Phases and drag libRCTAes.a from the Products folder inside the RCTAes.xcodeproj.
+##### Using CocoaPods (React Native 0.60 and higher)
+
+```sh
+cd ios
+pod install
+```
+
+##### Using React Native Link (React Native 0.59 and lower)
+
+Run `react-native link react-native-aes-crypto` after which you should be able to use this library on iOS.
 
 ### Installation (Android)
 
-#### Untested!
+##### React Native 0.60 and higher
+- Linking is done automatically
+
+##### Using React Native Link (React Native 0.59 and lower)
+-   In `android/settings.gradle`
 
 ```gradle
 ...
@@ -52,6 +63,8 @@ import com.tectiv3.aes.RCTAesPackage;
 protected List<ReactPackage> getPackages() {
    ......
    new RCTAesPackage(),
+   // or 
+   // packages.add(new RCTAesPackage());
    ......
 }
 ```
@@ -67,7 +80,7 @@ var Aes = NativeModules.Aes
 const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length)
 
 const encrypt = (text, key) => {
-    return Aes.randomKey(32).then(iv => {
+    return Aes.randomKey(16).then(iv => {
         return Aes.encrypt(text, key, iv).then(cipher => ({
             cipher,
             iv,
@@ -78,7 +91,7 @@ const encrypt = (text, key) => {
 const decrypt = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv)
 
 try {
-    generateKey('Arnold', 'salt', 5000, 512).then(key => {
+    generateKey('Arnold', 'salt', 5000, 256).then(key => {
         console.log('Key:', key)
         encrypt('These violent delights have violent ends', key)
             .then(({ cipher, iv }) => {
