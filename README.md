@@ -81,9 +81,7 @@ const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt,
 
 const encrypt = (text, key) => {
     return Aes.randomKey(16).then(iv => {
-        return Aes.encrypt(text, key, iv).then(cipher => {
-            return cipher;
-        })
+        return Aes.encrypt(text, key, iv)
     })
 }
 
