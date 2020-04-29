@@ -79,22 +79,22 @@ var Aes = NativeModules.Aes
 
 const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length)
 
-const encrypt = (text, key) => {
+const encryptData = (text, key) => {
     return Aes.randomKey(16).then(iv => {
         return Aes.encrypt(text, key, iv)
     })
 }
 
-const decrypt = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv)
+const decryptData = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv)
 
 try {
     generateKey('Arnold', 'salt', 5000, 256).then(key => {
         console.log('Key:', key)
-        encrypt('These violent delights have violent ends', key)
-            .then((cipher) => {
+        encryptData('These violent delights have violent ends', key)
+            .then(({ cipher, iv }) => {
                 console.log('Encrypted:', cipher)
 
-                decrypt({ cipher, iv }, key)
+                decryptData({ cipher, iv }, key)
                     .then(text => {
                         console.log('Decrypted:', text)
                     })
@@ -120,7 +120,7 @@ try {
 ```js
 async function asyncDecrypt(cipher, key, iv) {
     try {
-        var text = await decrypt({ cipher, iv }, key)
+        var text = await decryptData({ cipher, iv }, key)
         console.log(text)
         return text
     } catch (e) {
