@@ -83,7 +83,7 @@ const encryptData = (text, key) => {
     return Aes.randomKey(16).then(iv => {
         return Aes.encrypt(text, key, iv).then(cipher => ({
             cipher,
-            iv,	
+            iv,
         }))
     })
 }
