@@ -3,6 +3,7 @@ package com.tectiv3.aes;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +14,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.InvalidKeyException;
-
-import java.nio.charset.StandardCharsets;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -166,16 +165,18 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     private static String pbkdf2(String pwd, String salt, Integer cost, Integer length)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
+    throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException
     {
         PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA512Digest());
-        gen.init(pwd.getBytes(StandardCharsets.UTF_8), salt.getBytes(StandardCharsets.UTF_8), cost);
+        gen.init(pwd.getBytes("UTF_8"), salt.getBytes("UTF_8"), cost);
         byte[] key = ((KeyParameter) gen.generateDerivedParameters(length)).getKey();
         return bytesToHex(key);
     }
 
-    private static String hmac256(String text, String key) throws NoSuchAlgorithmException, InvalidKeyException  {
-        byte[] contentData = text.getBytes(StandardCharsets.UTF_8);
+    private static String hmac256(String text, String key)
+    throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException
+    {
+        byte[] contentData = text.getBytes("UTF_8");
         byte[] akHexData = Hex.decode(key);
         Mac sha256_HMAC = Mac.getInstance(HMAC_SHA_256);
         SecretKey secret_key = new SecretKeySpec(akHexData, HMAC_SHA_256);
