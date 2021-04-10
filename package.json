@@ -20,6 +20,7 @@
         "sha512",
         "pbkdf2",
         "hmac256",
+        "hmac512",
         "uuid"
     ],
     "homepage": "https://github.com/tectiv3/react-native-aes",

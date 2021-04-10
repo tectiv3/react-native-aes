@@ -138,6 +138,7 @@ async function asyncDecrypt(cipher, key, iv) {
 -   `decrypt(base64, key, iv)`
 -   `pbkdf2(text, salt, cost, length)`
 -   `hmac256(cipher, key)`
+-   `hmac512(cipher, key)`
 -   `sha1(text)`
 -   `sha256(text)`
 -   `sha512(text)`
