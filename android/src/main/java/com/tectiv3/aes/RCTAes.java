@@ -87,7 +87,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void hmac256(String data, String pwd, Promise promise) {
         try {
-            String strs = hmac256(data, pwd);
+            String strs = hmacX(data, pwd, HMAC_SHA_256);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -97,7 +97,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void hmac512(String data, String pwd, Promise promise) {
         try {
-            String strs = hmac512(data, pwd);
+            String strs = hmacX(data, pwd, HMAC_SHA_512);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -184,26 +184,15 @@ public class RCTAes extends ReactContextBaseJavaModule {
         return bytesToHex(key);
     }
 
-    private static String hmac256(String text, String key)
+    private static String hmacX(String text, String key, String algorithm)
     throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException
     {
         byte[] contentData = text.getBytes("UTF_8");
         byte[] akHexData = Hex.decode(key);
-        Mac sha256_HMAC = Mac.getInstance(HMAC_SHA_256);
-        SecretKey secret_key = new SecretKeySpec(akHexData, HMAC_SHA_256);
-        sha256_HMAC.init(secret_key);
-        return bytesToHex(sha256_HMAC.doFinal(contentData));
-    }
-
-    private static String hmac512(String text, String key)
-    throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException
-    {
-        byte[] contentData = text.getBytes("UTF_8");
-        byte[] akHexData = Hex.decode(key);
-        Mac sha512_HMAC = Mac.getInstance(HMAC_SHA_512);
-        SecretKey secret_key = new SecretKeySpec(akHexData, HMAC_SHA_512);
-        sha512_HMAC.init(secret_key);
-        return bytesToHex(sha512_HMAC.doFinal(contentData));
+        Mac sha_HMAC = Mac.getInstance(algorithm);
+        SecretKey secret_key = new SecretKeySpec(akHexData, algorithm);
+        sha_HMAC.init(secret_key);
+        return bytesToHex(sha_HMAC.doFinal(contentData));
     }
 
     final static IvParameterSpec emptyIvSpec = new IvParameterSpec(new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
