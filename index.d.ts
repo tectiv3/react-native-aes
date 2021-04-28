@@ -1,4 +1,4 @@
-declare module '@tectiv3/react-native-aes-crypto' {
+declare module 'react-native-aes-crypto' {
     function pbkdf2(password: string, salt: string, cost: number, length: number): Promise<string>;
     function encrypt(text: string, key: string, iv: string): Promise<string>;
     function decrypt(ciphertext: string, key: string, iv: string): Promise<string>;
