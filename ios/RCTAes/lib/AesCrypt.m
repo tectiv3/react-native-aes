@@ -109,6 +109,15 @@
     return [self toHex:nsdata];
 }
 
++ (NSString *) hmac512: (NSString *)input key: (NSString *)key {
+    NSData *keyData = [self fromHex:key];
+    NSData* inputData = [input dataUsingEncoding:NSUTF8StringEncoding];
+    void* buffer = malloc(CC_SHA512_DIGEST_LENGTH);
+    CCHmac(kCCHmacAlgSHA512, [keyData bytes], [keyData length], [inputData bytes], [inputData length], buffer);
+    NSData *nsdata = [NSData dataWithBytesNoCopy:buffer length:CC_SHA512_DIGEST_LENGTH freeWhenDone:YES];
+    return [self toHex:nsdata];
+}
+
 + (NSString *) sha1: (NSString *)input {
     NSData* inputData = [input dataUsingEncoding:NSUTF8StringEncoding];
     NSMutableData *result = [[NSMutableData alloc] initWithLength:CC_SHA1_DIGEST_LENGTH];

@@ -63,6 +63,18 @@ RCT_EXPORT_METHOD(hmac256:(NSString *)base64 key:(NSString *)key
     }
 }
 
+RCT_EXPORT_METHOD(hmac512:(NSString *)base64 key:(NSString *)key
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSError *error = nil;
+    NSString *data = [AesCrypt hmac512:base64 key:key];
+    if (data == nil) {
+        reject(@"hmac_fail", @"HMAC error", error);
+    } else {
+        resolve(data);
+    }
+}
+
 RCT_EXPORT_METHOD(sha1:(NSString *)text
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
