@@ -63,7 +63,7 @@ import com.tectiv3.aes.RCTAesPackage;
 protected List<ReactPackage> getPackages() {
    ......
    new RCTAesPackage(),
-   // or 
+   // or
    // packages.add(new RCTAesPackage());
    ......
 }
@@ -75,7 +75,7 @@ protected List<ReactPackage> getPackages() {
 
 ```js
 import { NativeModules, Platform } from 'react-native'
-var Aes = NativeModules.Aes
+import Aes from 'react-native-aes-crypto'
 
 const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length)
 
