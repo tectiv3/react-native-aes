@@ -30,9 +30,11 @@ Run `react-native link react-native-aes-crypto` after which you should be able t
 ### Installation (Android)
 
 ##### React Native 0.60 and higher
-- Linking is done automatically
+
+-   Linking is done automatically
 
 ##### Using React Native Link (React Native 0.59 and lower)
+
 -   In `android/settings.gradle`
 
 ```gradle
@@ -71,6 +73,10 @@ protected List<ReactPackage> getPackages() {
 
 ## Usage
 
+### Demo project
+
+[link](https://github.com/tectiv3/react-native-aes-demo)
+
 ### Example
 
 ```js
@@ -81,14 +87,14 @@ const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt,
 
 const encryptData = (text, key) => {
     return Aes.randomKey(16).then(iv => {
-        return Aes.encrypt(text, key, iv).then(cipher => ({
+        return Aes.encrypt(text, key, iv, 'aes-256-cbc').then(cipher => ({
             cipher,
             iv,
         }))
     })
 }
 
-const decryptData = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv)
+const decryptData = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv, 'aes-256-cbc')
 
 try {
     generateKey('Arnold', 'salt', 5000, 256).then(key => {
