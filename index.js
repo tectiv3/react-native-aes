@@ -1,4 +1,4 @@
-'use strict';
-import { NativeModules } from 'react-native';
+'use strict'
+import { NativeModules } from 'react-native'
 
-export default NativeModules.Aes;
+export default NativeModules.Aes
