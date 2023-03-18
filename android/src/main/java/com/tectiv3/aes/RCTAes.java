@@ -40,7 +40,8 @@ import com.facebook.react.bridge.Callback;
 
 public class RCTAes extends ReactContextBaseJavaModule {
 
-    private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
+    private static final String CIPHER_CBC_ALGORITHM = "AES/CBC/PKCS7Padding";
+    private static final String CIPHER_CTR_ALGORITHM = "AES/CTR/PKCS5Padding";
     public static final String HMAC_SHA_256 = "HmacSHA256";
     public static final String HMAC_SHA_512 = "HmacSHA512";
     private static final String KEY_ALGORITHM = "AES";
@@ -57,7 +58,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void encrypt(String data, String key, String iv, String algorithm, Promise promise) {
         try {
-            String result = encrypt(data, key, iv);
+            String result = encrypt(data, key, iv, algorithm.toLowerCase().contains("cbc")?CIPHER_CBC_ALGORITHM:CIPHER_CTR_ALGORITHM);
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -67,7 +68,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void decrypt(String data, String pwd, String iv, String algorithm, Promise promise) {
         try {
-            String strs = decrypt(data, pwd, iv);
+            String strs = decrypt(data, pwd, iv, algorithm.toLowerCase().contains("cbc")?CIPHER_CBC_ALGORITHM:CIPHER_CTR_ALGORITHM);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());

@@ -51,7 +51,7 @@
                     saltData.bytes,
                     saltData.length,
                     kCCPRFHmacAlgSHA512,
-                    cost,
+                    (unsigned int)cost,
                     hashKeyData.mutableBytes,
                     hashKeyData.length);
 
@@ -105,14 +105,98 @@
     return nil;
 }
 
++ (NSData *) AESCTR: (NSString *)operation data: (NSData *)data key: (NSString *)key iv: (NSString *)iv algorithm: (NSString *)algorithm {
+    //convert hex string to hex data
+    NSData *keyData = [self fromHex:key];
+    NSData *ivData = [self fromHex:iv];
+    //    NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
+    size_t numBytes = 0;
+    
+    NSArray *aesAlgorithms = @[@"aes-128-ctr", @"aes-192-ctr", @"aes-256-ctr"];
+    size_t item = [aesAlgorithms indexOfObject:algorithm];
+    size_t keyLength;
+    switch (item) {
+        case 0:
+            keyLength = kCCKeySizeAES128;
+            break;
+        case 1:
+            keyLength = kCCKeySizeAES192;
+            break;
+        default:
+            keyLength = kCCKeySizeAES256;
+            break;
+    }
+
+    NSMutableData * buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES128];
+    
+    CCCryptorRef cryptor = NULL;
+    
+    CCCryptorStatus cryptStatus = CCCryptorCreateWithMode(
+                    [operation isEqualToString:@"encrypt"] ? kCCEncrypt : kCCDecrypt,
+                    kCCModeCTR,
+                    kCCAlgorithmAES,
+                    ccPKCS7Padding,
+                    ivData.length ? ivData.bytes : nil,
+                    keyData.bytes,
+                    keyLength,
+                    NULL,
+                    0,
+                    0,
+                    kCCModeOptionCTR_BE,
+                    &cryptor);
+
+    if (cryptStatus == kCCSuccess) {
+            //Update Cryptor
+            CCCryptorStatus update = CCCryptorUpdate(cryptor,
+                    data.bytes,
+                    data.length,
+                    buffer.mutableBytes,
+                    buffer.length,
+                    &numBytes);
+            if (update == kCCSuccess)
+            {
+             //Cut Data Out with nedded length
+                buffer.length = numBytes;
+
+             //Final Cryptor
+             CCCryptorStatus final = CCCryptorFinal(cryptor, //CCCryptorRef cryptorRef,
+                                                    buffer.mutableBytes, //void *dataOut,
+                                                    buffer.length, // size_t dataOutAvailable,
+                                                    &numBytes); // size_t *dataOutMoved)
+
+             if (final == kCCSuccess)
+             {
+              //Release Cryptor
+              //CCCryptorStatus release =
+              CCCryptorRelease(cryptor); //CCCryptorRef cryptorRef
+             }
+             return buffer;
+        }
+    }
+    NSLog(@"AES error, %d", cryptStatus);
+    return nil;
+}
+
 + (NSString *) encrypt: (NSString *)clearText key: (NSString *)key iv: (NSString *)iv algorithm: (NSString *)algorithm {
-    NSData *result = [self AESCBC:@"encrypt" data:[clearText dataUsingEncoding:NSUTF8StringEncoding] key:key iv:iv algorithm:algorithm];
-    return [result base64EncodedStringWithOptions:0];
+    if ([algorithm containsString:@"ctr"]) {
+        NSData *result = [self AESCTR:@"encrypt" data:[clearText dataUsingEncoding:NSUTF8StringEncoding] key:key iv:iv algorithm:algorithm];
+        return [self toHex:result];
+    }
+    else{
+        NSData *result = [self AESCBC:@"encrypt" data:[clearText dataUsingEncoding:NSUTF8StringEncoding] key:key iv:iv algorithm:algorithm];
+        return [result base64EncodedStringWithOptions:0];
+    }
 }
 
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key iv: (NSString *)iv algorithm: (NSString *)algorithm {
-    NSData *result = [self AESCBC:@"decrypt" data:[[NSData alloc] initWithBase64EncodedString:cipherText options:0] key:key iv:iv algorithm:algorithm];
-    return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+    if ([algorithm containsString:@"ctr"]) {
+        NSData *result = [self AESCTR:@"decrypt" data:[self fromHex:cipherText] key:key iv:iv algorithm:algorithm];
+        return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+    }
+    else{
+        NSData *result = [self AESCBC:@"decrypt" data:[[NSData alloc] initWithBase64EncodedString:cipherText options:0] key:key iv:iv algorithm:algorithm];
+        return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+    }
 }
 
 + (NSString *) hmac256: (NSString *)input key: (NSString *)key {
