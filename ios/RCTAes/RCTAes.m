@@ -38,12 +38,17 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)base64 key:(NSString *)key iv:(NSString *)
     }
 }
 
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(pbkdf2Sync:(NSString *)password salt:(NSString *)salt
+                                       cost:(NSInteger)cost length:(NSInteger)length algorithm:(NSString *)algorithm) {
+    return [AesCrypt pbkdf2:password salt:salt cost:cost length:length algorithm:algorithm];;
+}
+
 RCT_EXPORT_METHOD(pbkdf2:(NSString *)password salt:(NSString *)salt
-                  cost:(NSInteger)cost length:(NSInteger)length
+                  cost:(NSInteger)cost length:(NSInteger)length algorithm:(NSString *)algorithm
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSError *error = nil;
-    NSString *data = [AesCrypt pbkdf2:password salt:salt cost:cost length:length];
+    NSString *data = [AesCrypt pbkdf2:password salt:salt cost:cost length:length algorithm:algorithm];
     if (data == nil) {
         reject(@"keygen_fail", @"Key generation failed", error);
     } else {

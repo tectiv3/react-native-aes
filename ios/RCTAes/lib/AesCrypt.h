@@ -10,7 +10,7 @@
 @interface AesCrypt : NSObject
 + (NSString *) encrypt: (NSString *)clearText  key: (NSString *)key iv: (NSString *)iv algorithm: (NSString *)algorithm;
 + (NSString *) decrypt: (NSString *)cipherText key: (NSString *)key iv: (NSString *)iv algorithm: (NSString *)algorithm;
-+ (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt cost: (NSInteger)cost length: (NSInteger)length;
++ (NSString *) pbkdf2:(NSString *)password salt: (NSString *)salt cost: (NSInteger)cost length: (NSInteger)length algorithm:(NSString *)algorithm;
 + (NSString *) hmac256: (NSString *)input key: (NSString *)key;
 + (NSString *) hmac512: (NSString *)input key: (NSString *)key;
 + (NSString *) sha1: (NSString *)input;

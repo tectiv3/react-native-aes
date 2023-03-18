@@ -75,10 +75,15 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public String pbkdf2Sync(String pwd, String salt, Integer cost, Integer length, String algorithm) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
+        return pbkdf2(pwd, salt, cost, length, algorithm);
+    }
+
     @ReactMethod
-    public void pbkdf2(String pwd, String salt, Integer cost, Integer length, Promise promise) {
+    public void pbkdf2(String pwd, String salt, Integer cost, Integer length, String algorithm, Promise promise) {
         try {
-            String strs = pbkdf2(pwd, salt, cost, length);
+            String strs = pbkdf2(pwd, salt, cost, length, algorithm);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -175,11 +180,20 @@ public class RCTAes extends ReactContextBaseJavaModule {
         }
         return new String(hexChars);
     }
-
-    private static String pbkdf2(String pwd, String salt, Integer cost, Integer length)
+    private static String pbkdf2(String pwd, String salt, Integer cost, Integer length, String algorithm)
     throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException
     {
-        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA512Digest());
+        Digest algorithmDigest = new SHA512Digest();
+        if (algorithm.equalsIgnoreCase("sha1")){
+            algorithmDigest = new SHA1Digest();
+        }
+        if (algorithm.equalsIgnoreCase("sha256")){
+            algorithmDigest = new SHA256Digest();
+        }
+        if (algorithm.equalsIgnoreCase("sha512")){
+            algorithmDigest = new SHA512Digest();
+        }
+        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(algorithmDigest);
         gen.init(pwd.getBytes("UTF_8"), salt.getBytes("UTF_8"), cost);
         byte[] key = ((KeyParameter) gen.generateDerivedParameters(length)).getKey();
         return bytesToHex(key);
