@@ -215,7 +215,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
 
     final static IvParameterSpec emptyIvSpec = new IvParameterSpec(new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
 
-    private static String encrypt(String text, String hexKey, String hexIv) throws Exception {
+    private static String encrypt(String text, String hexKey, String hexIv, String algorithm) throws Exception {
         if (text == null || text.length() == 0) {
             return null;
         }
@@ -223,13 +223,13 @@ public class RCTAes extends ReactContextBaseJavaModule {
         byte[] key = Hex.decode(hexKey);
         SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
 
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, hexIv == null ? emptyIvSpec : new IvParameterSpec(Hex.decode(hexIv)));
         byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
         return Base64.encodeToString(encrypted, Base64.NO_WRAP);
     }
 
-    private static String decrypt(String ciphertext, String hexKey, String hexIv) throws Exception {
+    private static String decrypt(String ciphertext, String hexKey, String hexIv, String algorithm) throws Exception {
         if(ciphertext == null || ciphertext.length() == 0) {
             return null;
         }
@@ -237,7 +237,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
         byte[] key = Hex.decode(hexKey);
         SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
 
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, hexIv == null ? emptyIvSpec : new IvParameterSpec(Hex.decode(hexIv)));
         byte[] decrypted = cipher.doFinal(Base64.decode(ciphertext, Base64.NO_WRAP));
         return new String(decrypted, "UTF-8");
