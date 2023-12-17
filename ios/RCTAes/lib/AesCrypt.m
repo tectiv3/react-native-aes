@@ -75,9 +75,11 @@
 
 + (NSData *) AESCBC: (NSString *)operation data: (NSData *)data key: (NSString *)key iv: (NSString *)iv algorithm: (NSString *)algorithm {
     //convert hex string to hex data
-    NSData *keyData = [self fromHex:key];
-    NSData *ivData = [self fromHex:iv];
-    //    NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
+    //NSData *keyData = [self fromHex:key];
+    //NSData *ivData = [self fromHex:iv];
+    NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *ivData = [iv dataUsingEncoding:NSUTF8StringEncoding];
+
     size_t numBytes = 0;
     
     NSArray *aesAlgorithms = @[@"aes-128-cbc", @"aes-192-cbc", @"aes-256-cbc"];
