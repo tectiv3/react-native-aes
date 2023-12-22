@@ -61,7 +61,8 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void encrypt(String data, String key, String iv, String algorithm, Promise promise) {
         try {
-            String result = encrypt(data, key, iv, algorithm.toLowerCase().contains("cbc")?CIPHER_CBC_ALGORITHM:CIPHER_CTR_ALGORITHM);
+            String result = encrypt(data, key, iv,
+                    algorithm.toLowerCase().contains("cbc") ? CIPHER_CBC_ALGORITHM : CIPHER_CTR_ALGORITHM);
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -71,7 +72,8 @@ public class RCTAes extends ReactContextBaseJavaModule {
     @ReactMethod
     public void decrypt(String data, String pwd, String iv, String algorithm, Promise promise) {
         try {
-            String strs = decrypt(data, pwd, iv, algorithm.toLowerCase().contains("cbc")?CIPHER_CBC_ALGORITHM:CIPHER_CTR_ALGORITHM);
+            String strs = decrypt(data, pwd, iv,
+                    algorithm.toLowerCase().contains("cbc") ? CIPHER_CBC_ALGORITHM : CIPHER_CTR_ALGORITHM);
             promise.resolve(strs);
         } catch (Exception e) {
             promise.reject("-1", e.getMessage());
@@ -79,7 +81,8 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
-    public String pbkdf2Sync(String pwd, String salt, Integer cost, Integer length, String algorithm) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public String pbkdf2Sync(String pwd, String salt, Integer cost, Integer length, String algorithm)
+            throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
         return pbkdf2(pwd, salt, cost, length, algorithm);
     }
 
@@ -176,24 +179,24 @@ public class RCTAes extends ReactContextBaseJavaModule {
     public static String bytesToHex(byte[] bytes) {
         final char[] hexArray = "0123456789abcdef".toCharArray();
         char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
+        for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
             hexChars[j * 2] = hexArray[v >>> 4];
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
     }
+
     private static String pbkdf2(String pwd, String salt, Integer cost, Integer length, String algorithm)
-    throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException
-    {
+            throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
         Digest algorithmDigest = new SHA512Digest();
-        if (algorithm.equalsIgnoreCase("sha1")){
+        if (algorithm.equalsIgnoreCase("sha1")) {
             algorithmDigest = new SHA1Digest();
         }
-        if (algorithm.equalsIgnoreCase("sha256")){
+        if (algorithm.equalsIgnoreCase("sha256")) {
             algorithmDigest = new SHA256Digest();
         }
-        if (algorithm.equalsIgnoreCase("sha512")){
+        if (algorithm.equalsIgnoreCase("sha512")) {
             algorithmDigest = new SHA512Digest();
         }
         PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(algorithmDigest);
@@ -203,8 +206,7 @@ public class RCTAes extends ReactContextBaseJavaModule {
     }
 
     private static String hmacX(String text, String key, String algorithm)
-    throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException
-    {
+            throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         byte[] contentData = text.getBytes("UTF_8");
         byte[] akHexData = Hex.decode(key);
         Mac sha_HMAC = Mac.getInstance(algorithm);
@@ -213,32 +215,35 @@ public class RCTAes extends ReactContextBaseJavaModule {
         return bytesToHex(sha_HMAC.doFinal(contentData));
     }
 
-    final static IvParameterSpec emptyIvSpec = new IvParameterSpec(new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+    final static IvParameterSpec emptyIvSpec = new IvParameterSpec(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
     private static String encrypt(String text, String hexKey, String hexIv, String algorithm) throws Exception {
         if (text == null || text.length() == 0) {
             return null;
         }
 
-        byte[] key = Hex.decode(hexKey);
+        byte[] key = hexKey.getBytes();
         SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
 
         Cipher cipher = Cipher.getInstance(algorithm);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, hexIv == null ? emptyIvSpec : new IvParameterSpec(Hex.decode(hexIv)));
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey,
+                hexIv == null ? emptyIvSpec : new IvParameterSpec(hexIv.getBytes()));
         byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
         return Base64.encodeToString(encrypted, Base64.NO_WRAP);
     }
 
     private static String decrypt(String ciphertext, String hexKey, String hexIv, String algorithm) throws Exception {
-        if(ciphertext == null || ciphertext.length() == 0) {
+        if (ciphertext == null || ciphertext.length() == 0) {
             return null;
         }
 
-        byte[] key = Hex.decode(hexKey);
+        byte[] key = kexKey.getBytes();
         SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
 
         Cipher cipher = Cipher.getInstance(algorithm);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, hexIv == null ? emptyIvSpec : new IvParameterSpec(Hex.decode(hexIv)));
+        cipher.init(Cipher.DECRYPT_MODE, secretKey,
+                hexIv == null ? emptyIvSpec : new IvParameterSpec(hexIv.getBytes()));
         byte[] decrypted = cipher.doFinal(Base64.decode(ciphertext, Base64.NO_WRAP));
         return new String(decrypted, "UTF-8");
     }
