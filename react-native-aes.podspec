@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.requires_arc  = true
   s.homepage      = "https://github.com/tectiv3/react-native-aes"
   s.source        = { :git => 'https://github.com/tectiv3/react-native-aes', :tag => "v#{s.version}" }
-  s.platform      = :ios, '9.0'
+  s.platforms     = { :ios => "9.0", :visionos => "1.0" }
   s.source_files  = "ios/**/*.{h,m}"
 
   s.dependency "React-Core"
