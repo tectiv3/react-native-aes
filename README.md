@@ -57,16 +57,16 @@ dependencies {
 
 ```java
 ......
-import com.tectiv3.aes.RCTAesPackage;
+import com.tectiv3.aes.AesPackage;
 
 ......
 
 @Override
 protected List<ReactPackage> getPackages() {
    ......
-   new RCTAesPackage(),
+   new AesPackage(),
    // or
-   // packages.add(new RCTAesPackage());
+   // packages.add(new AesPackage());
    ......
 }
 ```

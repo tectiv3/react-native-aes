@@ -42,6 +42,7 @@ android {
     lintOptions {
         abortOnError false
     }
+    namespace = "com.tectiv3.aes"
 }
 
 repositories {

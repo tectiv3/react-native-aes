@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32D980E11BE9F11C00FA27E5 /* RCTAes.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 32D980E01BE9F11C00FA27E5 /* RCTAes.h */; };
-		32D980E31BE9F11C00FA27E5 /* RCTAes.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D980E21BE9F11C00FA27E5 /* RCTAes.m */; };
+		32D980E11BE9F11C00FA27E5 /* Aes.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 32D980E01BE9F11C00FA27E5 /* Aes.h */; };
+		32D980E31BE9F11C00FA27E5 /* Aes.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D980E21BE9F11C00FA27E5 /* Aes.m */; };
 		9BE20B5B1E4E1A3700696172 /* AesCrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE20B5A1E4E1A3700696172 /* AesCrypt.m */; };
 /* End PBXBuildFile section */
 
@@ -19,16 +19,16 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				32D980E11BE9F11C00FA27E5 /* RCTAes.h in CopyFiles */,
+				32D980E11BE9F11C00FA27E5 /* Aes.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		32D980DD1BE9F11C00FA27E5 /* libRCTAes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTAes.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		32D980E01BE9F11C00FA27E5 /* RCTAes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTAes.h; sourceTree = "<group>"; };
-		32D980E21BE9F11C00FA27E5 /* RCTAes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTAes.m; sourceTree = "<group>"; };
+		32D980DD1BE9F11C00FA27E5 /* libAes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAes.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		32D980E01BE9F11C00FA27E5 /* Aes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Aes.h; sourceTree = "<group>"; };
+		32D980E21BE9F11C00FA27E5 /* Aes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Aes.m; sourceTree = "<group>"; };
 		9BE20B591E4E1A3700696172 /* AesCrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AesCrypt.h; sourceTree = "<group>"; };
 		9BE20B5A1E4E1A3700696172 /* AesCrypt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AesCrypt.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -47,7 +47,7 @@
 		32D980D41BE9F11C00FA27E5 = {
 			isa = PBXGroup;
 			children = (
-				32D980DF1BE9F11C00FA27E5 /* RCTAes */,
+				32D980DF1BE9F11C00FA27E5 /* Aes */,
 				32D980DE1BE9F11C00FA27E5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -55,19 +55,19 @@
 		32D980DE1BE9F11C00FA27E5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				32D980DD1BE9F11C00FA27E5 /* libRCTAes.a */,
+				32D980DD1BE9F11C00FA27E5 /* libAes.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		32D980DF1BE9F11C00FA27E5 /* RCTAes */ = {
+		32D980DF1BE9F11C00FA27E5 /* Aes */ = {
 			isa = PBXGroup;
 			children = (
-				32D980E01BE9F11C00FA27E5 /* RCTAes.h */,
-				32D980E21BE9F11C00FA27E5 /* RCTAes.m */,
+				32D980E01BE9F11C00FA27E5 /* Aes.h */,
+				32D980E21BE9F11C00FA27E5 /* Aes.m */,
 				32D981161BE9F1B600FA27E5 /* lib */,
 			);
-			path = RCTAes;
+			path = Aes;
 			sourceTree = "<group>";
 		};
 		32D981161BE9F1B600FA27E5 /* lib */ = {
@@ -82,9 +82,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		32D980DC1BE9F11C00FA27E5 /* RCTAes */ = {
+		32D980DC1BE9F11C00FA27E5 /* Aes */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 32D980F11BE9F11C00FA27E5 /* Build configuration list for PBXNativeTarget "RCTAes" */;
+			buildConfigurationList = 32D980F11BE9F11C00FA27E5 /* Build configuration list for PBXNativeTarget "Aes" */;
 			buildPhases = (
 				32D980D91BE9F11C00FA27E5 /* Sources */,
 				32D980DA1BE9F11C00FA27E5 /* Frameworks */,
@@ -94,9 +94,9 @@
 			);
 			dependencies = (
 			);
-			name = RCTAes;
-			productName = RCTAes;
-			productReference = 32D980DD1BE9F11C00FA27E5 /* libRCTAes.a */;
+			name = Aes;
+			productName = Aes;
+			productReference = 32D980DD1BE9F11C00FA27E5 /* libAes.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -113,7 +113,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 32D980D81BE9F11C00FA27E5 /* Build configuration list for PBXProject "RCTAes" */;
+			buildConfigurationList = 32D980D81BE9F11C00FA27E5 /* Build configuration list for PBXProject "Aes" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -126,7 +126,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				32D980DC1BE9F11C00FA27E5 /* RCTAes */,
+				32D980DC1BE9F11C00FA27E5 /* Aes */,
 			);
 		};
 /* End PBXProject section */
@@ -137,7 +137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9BE20B5B1E4E1A3700696172 /* AesCrypt.m in Sources */,
-				32D980E31BE9F11C00FA27E5 /* RCTAes.m in Sources */,
+				32D980E31BE9F11C00FA27E5 /* Aes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,7 +280,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		32D980D81BE9F11C00FA27E5 /* Build configuration list for PBXProject "RCTAes" */ = {
+		32D980D81BE9F11C00FA27E5 /* Build configuration list for PBXProject "Aes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D980EF1BE9F11C00FA27E5 /* Debug */,
@@ -289,7 +289,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		32D980F11BE9F11C00FA27E5 /* Build configuration list for PBXNativeTarget "RCTAes" */ = {
+		32D980F11BE9F11C00FA27E5 /* Build configuration list for PBXNativeTarget "Aes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D980F21BE9F11C00FA27E5 /* Debug */,

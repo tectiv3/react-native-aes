@@ -1,16 +1,16 @@
 //
-//  RCTAes.m
-//  RCTAes
+//  Aes.m
+//  Aes
 //
 //  Created by tectiv3 on 10/02/17.
 //  Copyright (c) 2017 tectiv3. All rights reserved.
 //
 
 
-#import "RCTAes.h"
+#import "Aes.h"
 #import "AesCrypt.h"
 
-@implementation RCTAes
+@implementation Aes
 
 RCT_EXPORT_MODULE()
 
