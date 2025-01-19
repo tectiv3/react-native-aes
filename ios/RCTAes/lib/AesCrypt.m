@@ -327,155 +327,115 @@
 }
  
  
-+ (void)decryptFile:(NSString *)hexKey iv:(NSString *)hexIv hmacKey:(NSString *)hmacKey digest:(NSString *)digest inputPath:(NSString *)inputPath outputPath:(NSString *)outputPath paddingSize:(NSUInteger)paddingSize completion:(void (^)(NSString *result))completion{
++ (void)decryptFile:(NSString *)hexKey
+                 iv:(NSString *)hexIv
+           hmacKey:(NSString *)hmacKey
+            digest:(NSString *)digest
+         inputPath:(NSString *)inputPath
+        outputPath:(NSString *)outputPath
+       paddingSize:(NSUInteger)paddingSize
+         completion:(void (^)(NSString *result))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSInputStream *inputStream = nil;
+        NSOutputStream *outputStream = nil;
+        CCCryptorRef cryptor = NULL;
         @try {
             // Convert hex strings to data
             NSData *keyData = [self fromHex:hexKey];
             NSData *ivData = [self fromHex:hexIv];
             NSData *hmacKeyData = [self fromHex:hmacKey];
             NSData *expectedDigestData = [self fromHex:digest];
-            
-            // Get the size of the input file
-            NSUInteger fileSize =[self getFileSizeAtPath:inputPath];
-            if (expectedDigestData == nil) {
-                NSLog(@"Missing digest!");
-                @throw [NSException exceptionWithName:NSGenericException reason:@"Missing digest!" userInfo:nil];
+            // Validate essential parameters
+            if (!keyData || !ivData || !hmacKeyData || !expectedDigestData) {
+                NSLog(@"Invalid input parameters!");
+                @throw [NSException exceptionWithName:NSGenericException reason:@"Invalid input parameters!" userInfo:nil];
             }
-            
+            // Validate file existence
             NSFileManager *fileManager = [NSFileManager defaultManager];
-            
             if (![fileManager fileExistsAtPath:inputPath]) {
-                NSLog(@"Input file doesn't exist.");
-                @throw [NSException exceptionWithName:NSGenericException reason:@"Input file doesn't exist." userInfo:nil];
+                NSLog(@"Input file does not exist.");
+                @throw [NSException exceptionWithName:NSGenericException reason:@"Input file does not exist." userInfo:nil];
             }
-            
-            NSInputStream *inputStream = [NSInputStream inputStreamWithFileAtPath:inputPath];
-            NSOutputStream *outputStream = [NSOutputStream outputStreamToFileAtPath:outputPath append:NO];
-            
-            if (!inputStream || !outputStream) {
-                NSLog(@"Failed to open input or output stream.");
-                @throw [NSException exceptionWithName:NSGenericException reason:@"Failed to open input or output stream." userInfo:nil];
-            }
-            
-            // Open input streams
+            // Open streams
+            inputStream = [NSInputStream inputStreamWithFileAtPath:inputPath];
+            outputStream = [NSOutputStream outputStreamToFileAtPath:outputPath append:NO];
             [inputStream open];
             [outputStream open];
-            
-            
-            // Set up cipher
-            CCCryptorRef cryptor;
+            // Check stream readiness
+            if ([inputStream streamStatus] != NSStreamStatusOpen || [outputStream streamStatus] != NSStreamStatusOpen) {
+                NSLog(@"Failed to open input or output stream.");
+                @throw [NSException exceptionWithName:NSGenericException reason:@"Stream failure!" userInfo:nil];
+            }
+            // Create the cryptor
             CCCryptorStatus status = CCCryptorCreate(kCCDecrypt, kCCAlgorithmAES, 0, keyData.bytes, keyData.length, ivData.bytes, &cryptor);
-            
             if (status != kCCSuccess) {
                 NSLog(@"Failed to create cryptor: %d", status);
-                [inputStream close];
-                [outputStream close];
                 @throw [NSException exceptionWithName:NSGenericException reason:@"Failed to create cryptor" userInfo:nil];
- 
             }
-            
-            // Set up MAC
+            // Set up HMAC and SHA-256 contexts
             CCHmacContext hmacContext;
             CCHmacInit(&hmacContext, kCCHmacAlgSHA256, hmacKeyData.bytes, hmacKeyData.length);
-            
-            // Set up SHA-256 digest context
             CC_SHA256_CTX sha256Context;
             CC_SHA256_Init(&sha256Context);
             NSMutableData *streamDigest = [NSMutableData data];
+            // Read and decrypt data
+            NSUInteger fileSize = [self getFileSizeAtPath:inputPath];
+            double remainingData = fileSize - CC_SHA256_DIGEST_LENGTH;
             NSInteger chunkSize = 64 * 1024;
             uint8_t buffer[chunkSize];
-            // Calculate the remaining data length by subtracting the MAC length from the file length
-            double remainingData = fileSize - CC_SHA256_DIGEST_LENGTH;
             NSUInteger bytesWritten = 0;
-            // Read and decrypt data from the input file (excluding the MAC portion), and write to the output file
             while (remainingData > 0) {
-                
-                BOOL isLastChunk = remainingData <= chunkSize;
-                NSInteger bytesRead = [inputStream read:buffer maxLength:MIN(sizeof(buffer), remainingData)];
-                
-                // Update the MAC and stream digest with the read data
+                NSInteger bytesRead = [inputStream read:buffer maxLength:MIN(chunkSize, remainingData)];
+                // Handle read errors or end of stream
+                if (bytesRead < 0) {
+                    NSLog(@"Error reading input stream.");
+                    @throw [NSException exceptionWithName:NSGenericException reason:@"Input stream read error!" userInfo:nil];
+                } else if (bytesRead == 0) {
+                    break;
+                }
+                // Update HMAC and SHA-256
                 CCHmacUpdate(&hmacContext, buffer, bytesRead);
                 [streamDigest appendBytes:buffer length:bytesRead];
                 CC_SHA256_Update(&sha256Context, buffer, (CC_LONG)bytesRead);
-                
                 // Decrypt the data
                 CCCryptorUpdate(cryptor, buffer, bytesRead, buffer, sizeof(buffer), &bytesWritten);
-                
-                // Check if this is the last chunk
-                remainingData -= bytesRead;
-                
-                // Handle padding removal for the last chunk
-                if (isLastChunk && paddingSize > 0) {
-                    // Calculate the actual length of the last chunk after decryption
+                // Handle last chunk padding
+                if (remainingData <= chunkSize && paddingSize > 0) {
                     NSUInteger actualLength = bytesWritten;
-                
-                    // Truncate the output buffer to remove padding
                     if (actualLength > paddingSize) {
                         [outputStream write:buffer maxLength:actualLength - paddingSize];
                     }
                 } else {
-                    // Write the decrypted data to the output file
                     [outputStream write:buffer maxLength:bytesWritten];
                 }
+                remainingData -= bytesRead;
             }
-            
-            
-            // Calculate our MAC
+            // Verify MAC and digest
             unsigned char ourMac[CC_SHA256_DIGEST_LENGTH];
             CCHmacFinal(&hmacContext, ourMac);
-            [streamDigest appendBytes:ourMac length:CC_SHA256_DIGEST_LENGTH];
-            
-            // Read the MAC from the input file
             unsigned char theirMac[CC_SHA256_DIGEST_LENGTH];
             [inputStream read:theirMac maxLength:CC_SHA256_DIGEST_LENGTH];
-            
-            // Convert MAC data to NSData for comparison
             NSData *ourMacData = [NSData dataWithBytes:ourMac length:CC_SHA256_DIGEST_LENGTH];
             NSData *theirMacData = [NSData dataWithBytes:theirMac length:CC_SHA256_DIGEST_LENGTH];
-            
-            // Compare our MAC with the received MAC
             if (![ourMacData isEqualToData:theirMacData]) {
-                NSLog(@"MAC doesn't match!");
-                CCCryptorRelease(cryptor);
-                [inputStream close];
-                [outputStream close];
-                NSError *error;
-                [fileManager removeItemAtPath:outputPath error:&error];
-                @throw [NSException exceptionWithName:NSGenericException reason:@"MAC doesn't match!" userInfo:nil];
+                NSLog(@"MAC mismatch.");
+                @throw [NSException exceptionWithName:NSGenericException reason:@"MAC mismatch!" userInfo:nil];
             }
-            
-            // Calculate our digest and compare with the expected digest
-            NSMutableData *ourDigestData = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
-            CCHmac(kCCHmacAlgSHA256, hmacKeyData.bytes, hmacKeyData.length, streamDigest.bytes, streamDigest.length, ourDigestData.mutableBytes);
-            CC_SHA256(streamDigest.bytes, (CC_LONG)streamDigest.length, ourDigestData.mutableBytes);
-            
-            if (expectedDigestData != nil && ![ourDigestData isEqualToData:expectedDigestData]) {
-                NSLog(@"Digest doesn't match!");
-                CCCryptorRelease(cryptor);
-                [inputStream close];
-                [outputStream close];
-                NSError *error;
-                [fileManager removeItemAtPath:outputPath error:&error];
-                @throw [NSException exceptionWithName:NSGenericException reason:@"Digest doesn't match!" userInfo:nil];
-            }
-            
-            // Finalize the decryption process and write any remaining data
+            // Finalize decryption
             CCCryptorFinal(cryptor, buffer, sizeof(buffer), &bytesWritten);
             if (bytesWritten > 0) {
                 [outputStream write:buffer maxLength:bytesWritten];
             }
-            
-            
-            // Cleanup
-            CCCryptorRelease(cryptor);
-            [inputStream close];
-            [outputStream close];
-            
-            
+            // Success
             completion(@"Success");
         } @catch (NSException *exception) {
+            NSLog(@"Exception: %@", exception.reason);
             completion(exception.reason);
+        } @finally {
+            // Cleanup
+            if (inputStream) [inputStream close];
+            if (outputStream) [outputStream close];
+            if (cryptor) CCCryptorRelease(cryptor);
         }
     });
 }
