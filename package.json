@@ -1,10 +1,10 @@
 {
-    "name": "react-native-aes-crypto",
-    "version": "3.2.1",
+    "name": "@jet-ezra/react-native-aes-crypto",
+    "version": "1.0.0",
     "description": "AES crypto native module for react-native",
     "main": "index.js",
     "types": "index.d.ts",
-    "author": "tectiv3",
+    "author": "Jet Ezra <https://github.com/jet2018>",
     "license": "MIT",
     "keywords": [
         "react-native",
@@ -23,13 +23,13 @@
         "hmac512",
         "uuid"
     ],
-    "homepage": "https://github.com/tectiv3/react-native-aes",
+    "homepage": "https://github.com/jet2018/react-native-aes",
     "bugs": {
-        "url": "https://github.com/tectiv3/react-native-aes/issues"
+        "url": "https://github.com/jet2018/react-native-aes/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/tectiv3/react-native-aes.git"
+        "url": "git://github.com/jet2018/react-native-aes.git"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
