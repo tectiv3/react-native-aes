@@ -4,3 +4,4 @@ ios/Aes.xcodeproj/project.xcworkspace/*
 android/.idea/*
 android/.gradle/*
 android/build/*
+.vscode/*
