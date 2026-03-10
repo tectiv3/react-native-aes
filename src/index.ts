@@ -28,6 +28,8 @@ const VALID_AES_ALGORITHMS = new Set<string>([
 
 const VALID_PBKDF2_ALGORITHMS = new Set<string>(['sha1', 'sha256', 'sha512'])
 
+const HEX_RE = /^[0-9a-fA-F]*$/
+
 // TurboModule (new arch) or bridge (old arch)
 const isTurboModuleEnabled = (global as any).__turboModuleProxy != null
 
@@ -95,12 +97,14 @@ export function pbkdf2(
 export function hmac256(data: string, key: string): Promise<string> {
     if (!data) throw new Error('data must not be empty')
     if (!key) throw new Error('key must not be empty')
+    if (!HEX_RE.test(key)) throw new Error('key must be a hex-encoded string')
     return AesModule.hmac256(data, key)
 }
 
 export function hmac512(data: string, key: string): Promise<string> {
     if (!data) throw new Error('data must not be empty')
     if (!key) throw new Error('key must not be empty')
+    if (!HEX_RE.test(key)) throw new Error('key must be a hex-encoded string')
     return AesModule.hmac512(data, key)
 }
 
@@ -132,6 +136,7 @@ export function encryptGcm(
     if (!data) throw new Error('data must not be empty')
     if (!key) throw new Error('key must not be empty')
     if (!iv) throw new Error('iv must not be empty')
+    if (iv.length !== 24) throw new Error('GCM IV must be exactly 12 bytes (24 hex characters)')
     if (!VALID_GCM_TAG_LENGTHS.has(tagLength)) {
         throw new Error('tagLength must be 96, 104, 112, 120, or 128')
     }
@@ -148,6 +153,7 @@ export function decryptGcm(
     if (!ciphertext) throw new Error('ciphertext must not be empty')
     if (!key) throw new Error('key must not be empty')
     if (!iv) throw new Error('iv must not be empty')
+    if (iv.length !== 24) throw new Error('GCM IV must be exactly 12 bytes (24 hex characters)')
     if (!VALID_GCM_TAG_LENGTHS.has(tagLength)) {
         throw new Error('tagLength must be 96, 104, 112, 120, or 128')
     }
@@ -158,6 +164,7 @@ export function randomUuid(): Promise<string> {
     return AesModule.randomUuid()
 }
 
+/** @param length Number of random bytes to generate (not bits). Returns hex string of `length * 2` chars. */
 export function randomKey(length: number): Promise<string> {
     if (length < 1) throw new Error('length must be a positive integer')
     return AesModule.randomKey(length)
@@ -165,4 +172,5 @@ export function randomKey(length: number): Promise<string> {
 
 export type { AesAlgorithm, PbkdfAlgorithm }
 
+/** Raw native module — bypasses JS-side input validation. Prefer using the named exports. */
 export default AesModule

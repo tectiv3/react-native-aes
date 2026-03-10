@@ -6,7 +6,9 @@
 - Minimum React Native 0.75, iOS 13.0, Android API 23
 - IV is now required — passing null/empty throws instead of using zeros
 - `pbkdf2Sync` removed — use async `pbkdf2` instead
-- CTR mode output changed from hex to base64 (now consistent with CBC)
+- CTR mode output changed from hex to base64 (now consistent with CBC).
+  **Migration note:** Data encrypted with v3 CTR cannot be decrypted with v4 directly.
+  Convert existing ciphertext: `Buffer.from(hexCiphertext, 'hex').toString('base64')`
 - Unknown algorithm strings now throw instead of falling back silently
 - Package now uses named exports alongside default export
 
@@ -17,6 +19,7 @@
 - **HIGH**: Strict algorithm whitelist — reject unknown values
 - **MEDIUM**: PBKDF2 returns nil on error instead of empty string (iOS)
 - **MEDIUM**: Enforce minimum PBKDF2 key length (128 bits)
+- **MEDIUM**: Enforce 12-byte IV for AES-GCM (NIST SP 800-38D)
 - **MEDIUM**: Fix iOS CTR cryptor handle leak on error paths
 - **MEDIUM**: Fix iOS CTR CCCryptorFinal buffer pointer arithmetic
 - **LOW**: Fix Android shaX charset to explicit UTF-8

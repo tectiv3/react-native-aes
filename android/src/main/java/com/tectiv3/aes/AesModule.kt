@@ -171,7 +171,7 @@ class AesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
             require(keyBytes.size == 16 || keyBytes.size == 24 || keyBytes.size == 32) {
                 "Key must be 16, 24, or 32 bytes, got ${keyBytes.size}"
             }
-            require(ivBytes.isNotEmpty()) { "IV must not be empty for GCM" }
+            require(ivBytes.size == 12) { "GCM IV must be exactly 12 bytes, got ${ivBytes.size}" }
 
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(keyBytes, "AES"), GCMParameterSpec(tagLength, ivBytes))
@@ -193,7 +193,7 @@ class AesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
             require(keyBytes.size == 16 || keyBytes.size == 24 || keyBytes.size == 32) {
                 "Key must be 16, 24, or 32 bytes, got ${keyBytes.size}"
             }
-            require(ivBytes.isNotEmpty()) { "IV must not be empty for GCM" }
+            require(ivBytes.size == 12) { "GCM IV must be exactly 12 bytes, got ${ivBytes.size}" }
 
             val combined = Base64.decode(ciphertext, Base64.NO_WRAP)
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
@@ -229,7 +229,10 @@ class AesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
         }
     }
 
+    private val HEX_RE = Regex("^[0-9a-fA-F]*$")
+
     private fun hmacInternal(text: String, hexKey: String, algorithm: String): String {
+        require(HEX_RE.matches(hexKey)) { "key must be a hex-encoded string" }
         val keyBytes = Hex.decode(hexKey)
         val mac = Mac.getInstance(algorithm)
         mac.init(SecretKeySpec(keyBytes, algorithm))

@@ -82,8 +82,9 @@ async function example() {
 
 ## Security Guidance
 
-- **Always use a random IV** — generate with `randomKey(16)` for each encryption
+- **Always use a random IV** — generate with `randomKey(16)` for CBC/CTR, `randomKey(12)` for GCM
 - **Never reuse an IV** with the same key
+- **GCM requires exactly 12-byte IV** (NIST SP 800-38D)
 - **Use sufficient PBKDF2 iterations** — minimum 100,000 for SHA-256, 210,000+ recommended (OWASP 2023)
 - **Prefer AES-256-CBC** with HMAC verification, or use GCM for authenticated encryption
 - **The `length` parameter in `pbkdf2` is in bits** — use 256 for a 32-byte key
@@ -94,7 +95,8 @@ async function example() {
 - **Minimum RN 0.75**, iOS 13.0, Android API 23
 - **IV is now required** — passing null/empty IV throws an error (v3 silently used zeros)
 - **`pbkdf2Sync` removed** — use the async `pbkdf2` instead
-- **CTR output is now base64** — v3 returned hex for CTR, base64 for CBC. v4 uses base64 for both
+- **CTR output is now base64** — v3 returned hex for CTR, base64 for CBC. v4 uses base64 for both.
+  To decrypt v3 CTR data with v4, convert first: `Buffer.from(hexCiphertext, 'hex').toString('base64')`
 - **Named exports** — `import { encrypt, decrypt } from 'react-native-aes-crypto'` (default export still works)
 - **Strict algorithm validation** — unknown algorithm strings now throw instead of falling back
 

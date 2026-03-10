@@ -152,7 +152,7 @@
         return nil;
     }
 
-    NSMutableData *buffer = [[NSMutableData alloc] initWithLength:[data length] + kCCBlockSizeAES128];
+    NSMutableData *buffer = [[NSMutableData alloc] initWithLength:[data length]];
     size_t numBytes = 0;
 
     CCCryptorRef cryptor = NULL;
@@ -296,8 +296,8 @@
         NSLog(@"AES-GCM error: key must be 16, 24, or 32 bytes");
         return nil;
     }
-    if (ivData.length < 1) {
-        NSLog(@"AES-GCM error: IV must not be empty");
+    if (ivData.length != 12) {
+        NSLog(@"AES-GCM error: IV must be exactly 12 bytes, got %lu", (unsigned long)ivData.length);
         return nil;
     }
 
@@ -337,8 +337,8 @@
         NSLog(@"AES-GCM error: key must be 16, 24, or 32 bytes");
         return nil;
     }
-    if (ivData.length < 1) {
-        NSLog(@"AES-GCM error: IV must not be empty");
+    if (ivData.length != 12) {
+        NSLog(@"AES-GCM error: IV must be exactly 12 bytes, got %lu", (unsigned long)ivData.length);
         return nil;
     }
 

@@ -1,4 +1,4 @@
-import { encrypt, decrypt, pbkdf2, hmac256, hmac512, randomKey, encryptGcm, decryptGcm } from '../index'
+import { encrypt, decrypt, pbkdf2, hmac256, hmac512, sha1, sha256, sha512, randomKey, encryptGcm, decryptGcm } from '../index'
 
 describe('input validation', () => {
     it('rejects empty data for encrypt', () => {
@@ -51,12 +51,45 @@ describe('input validation', () => {
         expect(() => hmac512('data', '')).toThrow('key must not be empty')
     })
 
+    it('rejects sha1 with empty text', () => {
+        expect(() => sha1('')).toThrow('text must not be empty')
+    })
+
+    it('rejects sha256 with empty text', () => {
+        expect(() => sha256('')).toThrow('text must not be empty')
+    })
+
+    it('rejects sha512 with empty text', () => {
+        expect(() => sha512('')).toThrow('text must not be empty')
+    })
+
+    it('accepts valid sha256 call', async () => {
+        const result = await sha256('hello')
+        expect(result).toBe('mockHash')
+    })
+
+    it('rejects hmac256 with non-hex key', () => {
+        expect(() => hmac256('data', 'not-hex!')).toThrow('hex-encoded')
+    })
+
+    it('rejects hmac512 with non-hex key', () => {
+        expect(() => hmac512('data', 'xyz')).toThrow('hex-encoded')
+    })
+
     it('rejects encryptGcm with invalid tag length', () => {
-        expect(() => encryptGcm('data', 'key', 'iv', '', 64)).toThrow('tagLength must be')
+        expect(() => encryptGcm('data', 'key', '000000000000000000000000', '', 64)).toThrow('tagLength must be')
+    })
+
+    it('rejects encryptGcm with non-12-byte IV', () => {
+        expect(() => encryptGcm('data', 'key', 'aabb', '', 128)).toThrow('12 bytes')
     })
 
     it('rejects decryptGcm with empty key', () => {
-        expect(() => decryptGcm('data', '', 'iv')).toThrow('key must not be empty')
+        expect(() => decryptGcm('data', '', '000000000000000000000000')).toThrow('key must not be empty')
+    })
+
+    it('rejects decryptGcm with non-12-byte IV', () => {
+        expect(() => decryptGcm('data', 'key', 'aabbccdd')).toThrow('12 bytes')
     })
 
     it('accepts valid encrypt call', async () => {
@@ -70,7 +103,7 @@ describe('input validation', () => {
     })
 
     it('accepts valid encryptGcm call', async () => {
-        const result = await encryptGcm('hello', 'key', 'iv')
+        const result = await encryptGcm('hello', 'key', '000000000000000000000000')
         expect(result).toBe('mockGcmCipher')
     })
 })
