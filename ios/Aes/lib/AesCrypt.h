@@ -16,6 +16,8 @@
 + (NSString *) sha1: (NSString *)input;
 + (NSString *) sha256: (NSString *)input;
 + (NSString *) sha512: (NSString *)input;
++ (NSString *) encryptGcm:(NSString *)clearText key:(NSString *)key iv:(NSString *)iv aad:(NSString *)aad tagLength:(NSInteger)tagLengthBits;
++ (NSString *) decryptGcm:(NSString *)cipherText key:(NSString *)key iv:(NSString *)iv aad:(NSString *)aad tagLength:(NSInteger)tagLengthBits;
 + (NSString *) toHex: (NSData *)nsdata;
 + (NSString *) randomUuid;
 + (NSString *) randomKey: (NSInteger)length;

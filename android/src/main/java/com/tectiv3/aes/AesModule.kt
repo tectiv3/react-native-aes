@@ -17,6 +17,7 @@ import java.util.UUID
 import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 class AesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -159,6 +160,51 @@ class AesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
             promise.resolve(shaInternal(data, "SHA-512"))
         } catch (e: Exception) {
             promise.reject("SHA_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun encryptGcm(data: String, key: String, iv: String, aad: String, tagLength: Int, promise: Promise) {
+        try {
+            val keyBytes = Hex.decode(key)
+            val ivBytes = Hex.decode(iv)
+            require(keyBytes.size == 16 || keyBytes.size == 24 || keyBytes.size == 32) {
+                "Key must be 16, 24, or 32 bytes, got ${keyBytes.size}"
+            }
+            require(ivBytes.isNotEmpty()) { "IV must not be empty for GCM" }
+
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(keyBytes, "AES"), GCMParameterSpec(tagLength, ivBytes))
+            if (aad.isNotEmpty()) {
+                cipher.updateAAD(aad.toByteArray(Charsets.UTF_8))
+            }
+            val encrypted = cipher.doFinal(data.toByteArray(Charsets.UTF_8))
+            promise.resolve(Base64.encodeToString(encrypted, Base64.NO_WRAP))
+        } catch (e: Exception) {
+            promise.reject("ENCRYPT_GCM_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun decryptGcm(ciphertext: String, key: String, iv: String, aad: String, tagLength: Int, promise: Promise) {
+        try {
+            val keyBytes = Hex.decode(key)
+            val ivBytes = Hex.decode(iv)
+            require(keyBytes.size == 16 || keyBytes.size == 24 || keyBytes.size == 32) {
+                "Key must be 16, 24, or 32 bytes, got ${keyBytes.size}"
+            }
+            require(ivBytes.isNotEmpty()) { "IV must not be empty for GCM" }
+
+            val combined = Base64.decode(ciphertext, Base64.NO_WRAP)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(keyBytes, "AES"), GCMParameterSpec(tagLength, ivBytes))
+            if (aad.isNotEmpty()) {
+                cipher.updateAAD(aad.toByteArray(Charsets.UTF_8))
+            }
+            val decrypted = cipher.doFinal(combined)
+            promise.resolve(String(decrypted, Charsets.UTF_8))
+        } catch (e: Exception) {
+            promise.reject("DECRYPT_GCM_ERROR", e.message, e)
         }
     }
 

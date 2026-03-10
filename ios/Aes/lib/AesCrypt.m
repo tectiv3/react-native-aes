@@ -285,6 +285,92 @@
     return [self toHex:result];
 }
 
++ (NSString *) encryptGcm:(NSString *)clearText key:(NSString *)key iv:(NSString *)iv
+                       aad:(NSString *)aad tagLength:(NSInteger)tagLengthBits {
+    NSData *keyData = [self fromHex:key];
+    NSData *ivData = [self fromHex:iv];
+    NSData *aadData = [aad dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *plainData = [clearText dataUsingEncoding:NSUTF8StringEncoding];
+
+    if (keyData.length != 16 && keyData.length != 24 && keyData.length != 32) {
+        NSLog(@"AES-GCM error: key must be 16, 24, or 32 bytes");
+        return nil;
+    }
+    if (ivData.length < 1) {
+        NSLog(@"AES-GCM error: IV must not be empty");
+        return nil;
+    }
+
+    size_t tagLength = tagLengthBits / 8;
+    NSMutableData *cipherData = [NSMutableData dataWithLength:plainData.length];
+    NSMutableData *tagData = [NSMutableData dataWithLength:tagLength];
+
+    CCCryptorStatus status = CCCryptorGCMOneshotEncrypt(
+        kCCAlgorithmAES,
+        keyData.bytes, keyData.length,
+        ivData.bytes, ivData.length,
+        aadData.bytes, aadData.length,
+        plainData.bytes, plainData.length,
+        cipherData.mutableBytes,
+        tagData.mutableBytes, tagLength);
+
+    if (status != kCCSuccess) {
+        NSLog(@"AES-GCM encrypt error: %d", status);
+        return nil;
+    }
+
+    NSMutableData *result = [NSMutableData dataWithData:cipherData];
+    [result appendData:tagData];
+    return [result base64EncodedStringWithOptions:0];
+}
+
++ (NSString *) decryptGcm:(NSString *)cipherText key:(NSString *)key iv:(NSString *)iv
+                       aad:(NSString *)aad tagLength:(NSInteger)tagLengthBits {
+    NSData *keyData = [self fromHex:key];
+    NSData *ivData = [self fromHex:iv];
+    NSData *aadData = [aad dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *combined = [[NSData alloc] initWithBase64EncodedString:cipherText options:0];
+
+    if (!combined) return nil;
+
+    if (keyData.length != 16 && keyData.length != 24 && keyData.length != 32) {
+        NSLog(@"AES-GCM error: key must be 16, 24, or 32 bytes");
+        return nil;
+    }
+    if (ivData.length < 1) {
+        NSLog(@"AES-GCM error: IV must not be empty");
+        return nil;
+    }
+
+    size_t tagLength = tagLengthBits / 8;
+    if (combined.length < tagLength) {
+        NSLog(@"AES-GCM error: ciphertext too short for tag");
+        return nil;
+    }
+
+    NSUInteger cipherLength = combined.length - tagLength;
+    NSData *cipherData = [combined subdataWithRange:NSMakeRange(0, cipherLength)];
+    NSData *tagData = [combined subdataWithRange:NSMakeRange(cipherLength, tagLength)];
+
+    NSMutableData *plainData = [NSMutableData dataWithLength:cipherLength];
+
+    CCCryptorStatus status = CCCryptorGCMOneshotDecrypt(
+        kCCAlgorithmAES,
+        keyData.bytes, keyData.length,
+        ivData.bytes, ivData.length,
+        aadData.bytes, aadData.length,
+        cipherData.bytes, cipherData.length,
+        plainData.mutableBytes,
+        tagData.bytes, tagLength);
+
+    if (status != kCCSuccess) {
+        NSLog(@"AES-GCM decrypt error: %d", status);
+        return nil;
+    }
+
+    return [[NSString alloc] initWithData:plainData encoding:NSUTF8StringEncoding];
+}
+
 + (NSString *) randomUuid {
     return [[NSUUID UUID] UUIDString];
 }

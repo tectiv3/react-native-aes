@@ -120,6 +120,40 @@ export function sha512(text: string): Promise<string> {
     return AesModule.sha512(text)
 }
 
+const VALID_GCM_TAG_LENGTHS = new Set([96, 104, 112, 120, 128])
+
+export function encryptGcm(
+    data: string,
+    key: string,
+    iv: string,
+    aad: string = '',
+    tagLength: number = 128
+): Promise<string> {
+    if (!data) throw new Error('data must not be empty')
+    if (!key) throw new Error('key must not be empty')
+    if (!iv) throw new Error('iv must not be empty')
+    if (!VALID_GCM_TAG_LENGTHS.has(tagLength)) {
+        throw new Error('tagLength must be 96, 104, 112, 120, or 128')
+    }
+    return AesModule.encryptGcm(data, key, iv, aad, tagLength)
+}
+
+export function decryptGcm(
+    ciphertext: string,
+    key: string,
+    iv: string,
+    aad: string = '',
+    tagLength: number = 128
+): Promise<string> {
+    if (!ciphertext) throw new Error('ciphertext must not be empty')
+    if (!key) throw new Error('key must not be empty')
+    if (!iv) throw new Error('iv must not be empty')
+    if (!VALID_GCM_TAG_LENGTHS.has(tagLength)) {
+        throw new Error('tagLength must be 96, 104, 112, 120, or 128')
+    }
+    return AesModule.decryptGcm(ciphertext, key, iv, aad, tagLength)
+}
+
 export function randomUuid(): Promise<string> {
     return AesModule.randomUuid()
 }

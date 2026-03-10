@@ -119,6 +119,30 @@ RCT_EXPORT_METHOD(randomKey:(NSInteger)length
     }
 }
 
+RCT_EXPORT_METHOD(encryptGcm:(NSString *)data key:(NSString *)key iv:(NSString *)iv
+                  aad:(NSString *)aad tagLength:(NSInteger)tagLength
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSString *result = [AesCrypt encryptGcm:data key:key iv:iv aad:aad tagLength:tagLength];
+    if (result == nil) {
+        reject(@"encrypt_gcm_fail", @"GCM encrypt error", nil);
+    } else {
+        resolve(result);
+    }
+}
+
+RCT_EXPORT_METHOD(decryptGcm:(NSString *)ciphertext key:(NSString *)key iv:(NSString *)iv
+                  aad:(NSString *)aad tagLength:(NSInteger)tagLength
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSString *result = [AesCrypt decryptGcm:ciphertext key:key iv:iv aad:aad tagLength:tagLength];
+    if (result == nil) {
+        reject(@"decrypt_gcm_fail", @"GCM decrypt error", nil);
+    } else {
+        resolve(result);
+    }
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params

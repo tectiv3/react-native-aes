@@ -16,6 +16,20 @@ export interface Spec extends TurboModule {
     sha1(text: string): Promise<string>
     sha256(text: string): Promise<string>
     sha512(text: string): Promise<string>
+    encryptGcm(
+        data: string,
+        key: string,
+        iv: string,
+        aad: string,
+        tagLength: number
+    ): Promise<string>
+    decryptGcm(
+        ciphertext: string,
+        key: string,
+        iv: string,
+        aad: string,
+        tagLength: number
+    ): Promise<string>
     randomUuid(): Promise<string>
     randomKey(length: number): Promise<string>
 }
