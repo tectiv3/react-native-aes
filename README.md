@@ -1,152 +1,103 @@
 # React Native AES
 
-AES encryption/decryption for react-native
+AES encryption/decryption native module for React Native.
+
+> **Note:** Version 4.x requires React Native 0.75 or higher. If you need to support
+> earlier versions of React Native, please use version 3.x of this library.
 
 ## Installation
 
 ```sh
-npm install --save react-native-aes-crypto
+npm install react-native-aes-crypto
 ```
 
-or
+### iOS
 
 ```sh
-yarn add react-native-aes-crypto
+cd ios && pod install
 ```
 
-### Installation (iOS)
+### Android
 
-##### Using CocoaPods (React Native 0.60 and higher)
-
-```sh
-cd ios
-pod install
-```
-
-##### Using React Native Link (React Native 0.59 and lower)
-
-Run `react-native link react-native-aes-crypto` after which you should be able to use this library on iOS.
-
-### Installation (Android)
-
-##### React Native 0.60 and higher
-
--   Linking is done automatically
-
-##### Using React Native Link (React Native 0.59 and lower)
-
--   In `android/settings.gradle`
-
-```gradle
-...
-include ':react-native-aes-crypto'
-project(':react-native-aes-crypto').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-aes-crypto/android')
-```
-
--   In `android/app/build.gradle`
-
-```gradle
-...
-dependencies {
-    ...
-    compile project(':react-native-aes-crypto')
-}
-```
-
--   register module (in MainApplication.java)
-
-```java
-......
-import com.tectiv3.aes.AesPackage;
-
-......
-
-@Override
-protected List<ReactPackage> getPackages() {
-   ......
-   new AesPackage(),
-   // or
-   // packages.add(new AesPackage());
-   ......
-}
-```
+Linking is automatic via autolinking.
 
 ## Usage
 
-### Demo project
+```typescript
+import { encrypt, decrypt, pbkdf2, hmac256, randomKey } from 'react-native-aes-crypto'
 
-[link](https://github.com/tectiv3/react-native-aes-demo)
+async function example() {
+    const key = await pbkdf2('password', 'salt', 100000, 256, 'sha256')
+    const iv = await randomKey(16)
 
-### Example
+    const cipher = await encrypt('Hello, World!', key, iv, 'aes-256-cbc')
+    console.log('Encrypted:', cipher)
 
-```js
-import { NativeModules, Platform } from 'react-native'
-import Aes from 'react-native-aes-crypto'
+    const plaintext = await decrypt(cipher, key, iv, 'aes-256-cbc')
+    console.log('Decrypted:', plaintext)
 
-const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length, 'sha256')
-
-const encryptData = (text, key) => {
-    return Aes.randomKey(16).then(iv => {
-        return Aes.encrypt(text, key, iv, 'aes-256-cbc').then(cipher => ({
-            cipher,
-            iv,
-        }))
-    })
-}
-
-const decryptData = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv, 'aes-256-cbc')
-
-try {
-    generateKey('Arnold', 'salt', 5000, 256).then(key => {
-        console.log('Key:', key)
-        encryptData('These violent delights have violent ends', key)
-            .then(({ cipher, iv }) => {
-                console.log('Encrypted:', cipher)
-
-                decryptData({ cipher, iv }, key)
-                    .then(text => {
-                        console.log('Decrypted:', text)
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    })
-
-                Aes.hmac256(cipher, key).then(hash => {
-                    console.log('HMAC', hash)
-                })
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    })
-} catch (e) {
-    console.error(e)
+    const hash = await hmac256(cipher, key)
+    console.log('HMAC:', hash)
 }
 ```
 
-#### Or
+## API Reference
 
-```js
-async function asyncDecrypt(cipher, key, iv) {
-    try {
-        var text = await decryptData({ cipher, iv }, key)
-        console.log(text)
-        return text
-    } catch (e) {
-        console.error(e)
-    }
-}
-```
+### Encryption
 
-### methods
+- **`encrypt(data, key, iv, algorithm)`** — Encrypt plaintext. Returns base64.
+- **`decrypt(ciphertext, key, iv, algorithm)`** — Decrypt base64 ciphertext. Returns plaintext.
 
--   `encrypt(text, key, iv, algorithm)`
--   `decrypt(base64, key, iv, algorithm)`
--   `pbkdf2(text, salt, cost, length, algorithm)`
--   `hmac256(cipher, key)`
--   `hmac512(cipher, key)`
--   `sha1(text)`
--   `sha256(text)`
--   `sha512(text)`
--   `randomUuid()`
--   `randomKey(length)`
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `data` / `ciphertext` | `string` | Plaintext or base64-encoded ciphertext |
+| `key` | `string` | Hex-encoded key (16, 24, or 32 bytes) |
+| `iv` | `string` | Hex-encoded IV (16 bytes) |
+| `algorithm` | `AesAlgorithm` | `aes-128-cbc`, `aes-192-cbc`, `aes-256-cbc`, `aes-128-ctr`, `aes-192-ctr`, `aes-256-ctr` |
+
+### Key Derivation
+
+- **`pbkdf2(password, salt, cost, length, algorithm)`** — Derive a key. Returns hex.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `password` | `string` | Password to derive from |
+| `salt` | `string` | Salt string |
+| `cost` | `number` | Iteration count (min 100,000 recommended) |
+| `length` | `number` | Key length **in bits** (e.g., 256 for 32-byte key) |
+| `algorithm` | `PbkdfAlgorithm` | `sha1`, `sha256`, `sha512` |
+
+### Hashing & HMAC
+
+- **`hmac256(data, key)`** — HMAC-SHA256. Key is hex-encoded. Returns hex.
+- **`hmac512(data, key)`** — HMAC-SHA512. Key is hex-encoded. Returns hex.
+- **`sha256(text)`** — SHA-256 hash. Returns hex.
+- **`sha512(text)`** — SHA-512 hash. Returns hex.
+- **~~`sha1(text)`~~** — Deprecated. Use `sha256` or `sha512`.
+
+### Utilities
+
+- **`randomKey(length)`** — Generate `length` random bytes. Returns hex.
+- **`randomUuid()`** — Generate a random UUID v4.
+
+## Security Guidance
+
+- **Always use a random IV** — generate with `randomKey(16)` for each encryption
+- **Never reuse an IV** with the same key
+- **Use sufficient PBKDF2 iterations** — minimum 100,000 for SHA-256, 210,000+ recommended (OWASP 2023)
+- **Prefer AES-256-CBC** with HMAC verification, or use GCM for authenticated encryption
+- **The `length` parameter in `pbkdf2` is in bits** — use 256 for a 32-byte key
+- **`sha1` is deprecated** — use `sha256` or `sha512` instead
+
+## Migrating from v3
+
+- **Minimum RN 0.75**, iOS 13.0, Android API 23
+- **IV is now required** — passing null/empty IV throws an error (v3 silently used zeros)
+- **`pbkdf2Sync` removed** — use the async `pbkdf2` instead
+- **CTR output is now base64** — v3 returned hex for CTR, base64 for CBC. v4 uses base64 for both
+- **Named exports** — `import { encrypt, decrypt } from 'react-native-aes-crypto'` (default export still works)
+- **Strict algorithm validation** — unknown algorithm strings now throw instead of falling back
+
+## License
+
+MIT
