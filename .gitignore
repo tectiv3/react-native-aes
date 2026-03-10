@@ -1,6 +1,9 @@
 .DS_Store
-ios/Aes.xcodeproj/xcuserdata/*
-ios/Aes.xcodeproj/project.xcworkspace/*
-android/.idea/*
-android/.gradle/*
-android/build/*
+node_modules/
+lib/
+android/build/
+android/.gradle/
+android/.idea/
+ios/build/
+ios/Pods/
+*.tgz

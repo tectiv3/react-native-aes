@@ -1,37 +1,74 @@
 {
     "name": "react-native-aes-crypto",
-    "version": "3.3.0",
-    "description": "AES crypto native module for react-native",
-    "main": "index.js",
-    "types": "index.d.ts",
-    "author": "tectiv3",
-    "license": "MIT",
+    "version": "4.0.0",
+    "description": "AES encryption/decryption native module for React Native",
+    "main": "lib/commonjs/index",
+    "module": "lib/module/index",
+    "types": "lib/typescript/src/index.d.ts",
+    "react-native": "src/index",
+    "source": "src/index",
+    "files": [
+        "src",
+        "lib",
+        "android",
+        "ios",
+        "react-native-aes.podspec",
+        "!android/build",
+        "!ios/build",
+        "!**/__tests__"
+    ],
+    "scripts": {
+        "prepare": "bob build",
+        "typecheck": "tsc --noEmit -p tsconfig.build.json",
+        "lint": "eslint src/",
+        "format": "prettier --write src/"
+    },
     "keywords": [
         "react-native",
-        "react-component",
-        "ios",
-        "android",
         "aes",
         "crypto",
-        "mobile",
-        "async",
-        "sha1",
-        "sha256",
-        "sha512",
+        "encryption",
+        "decryption",
         "pbkdf2",
-        "hmac256",
-        "hmac512",
-        "uuid"
+        "hmac",
+        "sha256",
+        "sha512"
     ],
-    "homepage": "https://github.com/tectiv3/react-native-aes",
-    "bugs": {
-        "url": "https://github.com/tectiv3/react-native-aes/issues"
-    },
     "repository": {
         "type": "git",
         "url": "git://github.com/tectiv3/react-native-aes.git"
     },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+    "author": "tectiv3",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/tectiv3/react-native-aes/issues"
+    },
+    "homepage": "https://github.com/tectiv3/react-native-aes",
+    "peerDependencies": {
+        "react": ">=18.0.0",
+        "react-native": ">=0.75.0"
+    },
+    "devDependencies": {
+        "react": "^18.0.0",
+        "react-native": "^0.75.0",
+        "react-native-builder-bob": "^0.35.0",
+        "typescript": "^5.0.0"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "codegenConfig": {
+        "name": "RNAesSpec",
+        "type": "modules",
+        "jsSrcsDir": "src"
+    },
+    "react-native-builder-bob": {
+        "source": "src",
+        "output": "lib",
+        "targets": [
+            "commonjs",
+            "module",
+            ["typescript", { "project": "tsconfig.build.json" }]
+        ]
     }
 }
