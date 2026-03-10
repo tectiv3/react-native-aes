@@ -1,0 +1,16 @@
+.DS_Store
+.git
+.github
+.prettierrc*
+.eslintrc*
+.gitignore
+.claude
+.serena
+docs/
+src/__tests__/
+tsconfig*.json
+jest.config.*
+*.tgz
+node_modules/
+android/build/
+ios/build/

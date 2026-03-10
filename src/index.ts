@@ -29,7 +29,7 @@ const VALID_AES_ALGORITHMS = new Set<string>([
 const VALID_PBKDF2_ALGORITHMS = new Set<string>(['sha1', 'sha256', 'sha512'])
 
 // TurboModule (new arch) or bridge (old arch)
-const isTurboModuleEnabled = global.__turboModuleProxy != null
+const isTurboModuleEnabled = (global as any).__turboModuleProxy != null
 
 const AesModule: Spec = isTurboModuleEnabled
     ? require('./NativeAes').default

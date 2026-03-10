@@ -7,3 +7,4 @@ android/.idea/
 ios/build/
 ios/Pods/
 *.tgz
+package-lock.json

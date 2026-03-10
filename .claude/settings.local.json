@@ -6,7 +6,10 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:discourse.joplinapp.org)",
       "Bash(ls:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx bob:*)",
+      "Bash(npx jest:*)"
     ]
   }
 }
