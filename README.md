@@ -26,19 +26,45 @@ Linking is automatic via autolinking.
 ```typescript
 import { encrypt, decrypt, pbkdf2, hmac256, randomKey } from 'react-native-aes-crypto'
 
-async function example() {
-    const key = await pbkdf2('password', 'salt', 100000, 256, 'sha256')
+const generateKey = (password: string, salt: string) =>
+    pbkdf2(password, salt, 100000, 256, 'sha256')
+
+const encryptData = async (text: string, key: string) => {
     const iv = await randomKey(16)
-
-    const cipher = await encrypt('Hello, World!', key, iv, 'aes-256-cbc')
-    console.log('Encrypted:', cipher)
-
-    const plaintext = await decrypt(cipher, key, iv, 'aes-256-cbc')
-    console.log('Decrypted:', plaintext)
-
-    const hash = await hmac256(cipher, key)
-    console.log('HMAC:', hash)
+    const cipher = await encrypt(text, key, iv, 'aes-256-cbc')
+    return { cipher, iv }
 }
+
+const decryptData = (encryptedData: { cipher: string; iv: string }, key: string) =>
+    decrypt(encryptedData.cipher, key, encryptedData.iv, 'aes-256-cbc')
+
+try {
+    const key = await generateKey('Arnold', 'salt')
+    console.log('Key:', key)
+
+    const encrypted = await encryptData('These violent delights have violent ends', key)
+    console.log('Encrypted:', encrypted.cipher)
+
+    const text = await decryptData(encrypted, key)
+    console.log('Decrypted:', text)
+
+    const hash = await hmac256(encrypted.cipher, key)
+    console.log('HMAC:', hash)
+} catch (e) {
+    console.error(e)
+}
+```
+
+### AES-GCM (Authenticated Encryption)
+
+```typescript
+import { encryptGcm, decryptGcm, randomKey } from 'react-native-aes-crypto'
+
+const key = await randomKey(32) // 256-bit key
+const iv = await randomKey(12) // 12-byte IV required for GCM
+
+const cipher = await encryptGcm('sensitive data', key, iv, 'optional-aad')
+const plaintext = await decryptGcm(cipher, key, iv, 'optional-aad')
 ```
 
 ## API Reference
