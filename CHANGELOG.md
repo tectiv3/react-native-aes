@@ -31,8 +31,9 @@
 - TurboModule support (React Native New Architecture)
 - Codegen spec for type-safe native bridge
 - JS-side input validation with descriptive error messages
+- Swift Package Manager support (`Package.swift`)
 - Security guidance in README
-- Unit tests for input validation
+- Unit tests for input validation and usage patterns
 
 ### Changed
 - Android rewritten in Kotlin
@@ -46,4 +47,4 @@
 - `pbkdf2Sync` (blocked JS thread)
 - SpongyCastle dependency
 - Legacy `react-native link` support
-- `Aes.xcodeproj` (CocoaPods-only now)
+- `Aes.xcodeproj` (CocoaPods/SPM now)

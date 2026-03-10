@@ -11,11 +11,26 @@ AES encryption/decryption native module for React Native.
 npm install react-native-aes-crypto
 ```
 
-### iOS
+### iOS (CocoaPods)
 
 ```sh
 cd ios && pod install
 ```
+
+### iOS (Swift Package Manager)
+
+In Xcode, go to **File → Add Package Dependencies** and enter the repository URL.
+Or add to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/tectiv3/react-native-aes.git", from: "4.0.0")
+]
+```
+
+> **Note:** SPM support requires that React Native headers are available in your build
+> environment. For most React Native projects, CocoaPods autolinking is still the
+> standard integration method.
 
 ### Android
 

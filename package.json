@@ -13,6 +13,7 @@
         "android",
         "ios",
         "react-native-aes.podspec",
+        "Package.swift",
         "!android/build",
         "!ios/build",
         "!**/__tests__"
