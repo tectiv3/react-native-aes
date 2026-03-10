@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebSearch",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:discourse.joplinapp.org)",
+      "Bash(ls:*)",
+      "Bash(git:*)"
+    ]
+  }
+}

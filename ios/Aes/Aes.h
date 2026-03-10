@@ -1,14 +1,13 @@
-//
-//  Aes.h
-//  Aes
-//
-//  Created by tectiv3 on 10/02/17.
-//  Copyright (c) 2017 tectiv3. All rights reserved.
-//
-
-
 #import <React/RCTBridgeModule.h>
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <RNAesSpec/RNAesSpec.h>
+#endif
+
+#ifdef RCT_NEW_ARCH_ENABLED
+@interface Aes : NSObject <NativeAesSpec>
+#else
 @interface Aes : NSObject <RCTBridgeModule>
+#endif
 
 @end
